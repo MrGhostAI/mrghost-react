@@ -2,11 +2,25 @@ import React, { useState } from "react";
 import { Fab, Paper, Typography, IconButton } from "@mui/material";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import CloseIcon from "@mui/icons-material/Close";
+import io from "socket.io-client";
 
 //TODO: Add properties to control theme, size, and color
 //TODO: Break down code into smaller components
 export function ChatBubble() {
   const [isBotInitialized, setBotInitialized] = useState<boolean>(false);
+
+  const initializeChatBot = () => {
+    setBotInitialized(true);
+
+    // Connect to chat socket
+    const socket = io("/chat");
+
+    socket.on("connect", () => {
+      console.log("connected");
+    });
+
+    console.log(`Socket ID: ${socket.id}`);
+  };
   return (
     <>
       {isBotInitialized ? (
@@ -37,7 +51,7 @@ export function ChatBubble() {
           aria-label="add"
           size="small"
           style={{ position: "fixed", bottom: "10px", right: "10px" }}
-          onClick={() => setBotInitialized(true)}
+          onClick={initializeChatBot}
         >
           <ChatBubbleIcon fontSize="small" />
         </Fab>
