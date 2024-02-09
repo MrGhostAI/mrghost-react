@@ -12,15 +12,6 @@ export function ChatWidget() {
 
   const initializeChatBot = () => {
     setBotInitialized(true);
-
-    // Connect to chat socket
-    const socket = io(`${BASE_API_URL}/chat`);
-
-    socket.on("connect", () => {
-      console.log("connected");
-    });
-
-    console.log(`Socket ID: ${socket.id}`);
   };
   return (
     <ThemeProvider theme={HappyMLTheme}>

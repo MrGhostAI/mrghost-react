@@ -1,14 +1,7 @@
 import React from "react";
-import {
-  Fab,
-  Paper,
-  Typography,
-  IconButton,
-  ThemeProvider,
-  CssBaseline,
-} from "@mui/material";
+import { Paper, Typography, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
+import ChatInputBar from "./ChatInputBar";
 interface ChatPanelProps {
   close: () => void;
 }
@@ -20,19 +13,24 @@ export default function ChatPanel({ close }: ChatPanelProps) {
         position: "fixed",
         bottom: 10,
         right: 16,
-        padding: 16,
-        height: 400,
+        height: 600,
         width: 400,
       }}
     >
       <IconButton
         onClick={close}
-        style={{ position: "absolute", top: 8, right: 8 }}
+        sx={{ position: "absolute", top: 8, right: 8 }}
       >
         <CloseIcon />
       </IconButton>
-      <Typography variant="h6">Support Chat</Typography>
-      <Typography variant="body2">This is your support UI content.</Typography>
+
+      <main>
+        <div style={{ padding: 10 }}>
+          <Typography variant="h6">happyml</Typography>
+        </div>
+
+        <ChatInputBar />
+      </main>
     </Paper>
   );
 }
