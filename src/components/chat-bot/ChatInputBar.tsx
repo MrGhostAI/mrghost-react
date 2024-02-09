@@ -14,7 +14,7 @@ export default function ChatInputBar() {
         type="text"
         // value={text}
         placeholder="Type your message here"
-        size="small"
+        size="medium"
         name="message"
         multiline={true}
         fullWidth

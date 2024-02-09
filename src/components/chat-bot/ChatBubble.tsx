@@ -11,7 +11,7 @@ export default function ChatBubble({ initializeChatBot }: ChatBubbleProps) {
     <Fab
       color="primary"
       aria-label="add"
-      size="small"
+      size="medium"
       style={{ position: "fixed", bottom: "10px", right: "10px" }}
       onClick={initializeChatBot}
     >
