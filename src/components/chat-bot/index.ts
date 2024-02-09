@@ -1,1 +1,1 @@
-export * from "./ChatBubble";
+export * from "./ChatWidget";

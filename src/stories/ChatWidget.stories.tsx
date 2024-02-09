@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { ChatBubble } from "../components";
+import { ChatWidget } from "../components";
 
 //👇 This default export determines where your story goes in the story list
-const meta: Meta<typeof ChatBubble> = {
-  component: ChatBubble,
+const meta: Meta<typeof ChatWidget> = {
+  component: ChatWidget,
 };
 
 export default meta;
-type Story = StoryObj<typeof ChatBubble>;
+type Story = StoryObj<typeof ChatWidget>;
 
 export const FirstStory: Story = {
   args: {
