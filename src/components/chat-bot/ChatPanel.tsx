@@ -27,10 +27,6 @@ export default function ChatPanel({ close }: ChatPanelProps) {
 
       <main>
         <div style={{ padding: 10 }}>
-          <Typography variant="h6" mb={2}>
-            happyml
-          </Typography>
-
           <ChatMessage
             message={{
               text: "Hey, how can I help you?",

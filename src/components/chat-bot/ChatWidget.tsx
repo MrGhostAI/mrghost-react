@@ -12,6 +12,9 @@ export function ChatWidget() {
 
   const initializeChatBot = () => {
     setBotInitialized(true);
+    const socket = io("http://localhost:3000/chat");
+
+    console.log(`Socket ${socket}`);
   };
   return (
     <ThemeProvider theme={HappyMLTheme}>
