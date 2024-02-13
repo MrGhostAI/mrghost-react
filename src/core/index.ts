@@ -1,0 +1,1 @@
+export {useRegisterAction} from './aiaction'
