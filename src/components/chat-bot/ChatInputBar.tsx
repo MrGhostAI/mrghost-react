@@ -1,18 +1,31 @@
 import React from "react";
 import { Box, TextField, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import { ChatContext } from "../../contexts";
 
 export default function ChatInputBar() {
+  const [text, setText] = React.useState("");
+  const { sendMessage } = React.useContext(ChatContext);
+
+  // Form submission handler
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    sendMessage(text); // Send the message to the server
+    setText(""); // Clear the input field after submitting the message
+  };
+
   return (
     <Box
       sx={{
         ...styles.inputContainer,
       }}
       component="form"
+      onSubmit={onSubmit}
     >
       <TextField
         type="text"
-        // value={text}
+        value={text}
         placeholder="Type your message here"
         size="medium"
         name="message"
@@ -25,9 +38,9 @@ export default function ChatInputBar() {
             color: "#000",
           },
         }}
-        onChange={(e) => console.log(e.target.value)}
+        onChange={(e) => setText(e.target.value)}
       />
-      <Button variant="text" sx={styles.sendButton}>
+      <Button variant="text" sx={styles.sendButton} type="submit">
         <SendIcon />
       </Button>
     </Box>

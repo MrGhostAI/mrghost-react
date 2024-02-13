@@ -1,13 +1,16 @@
 import React from "react";
-import { Paper, Typography, IconButton } from "@mui/material";
+import { Paper, IconButton, Box } from "@mui/material";
+import { ChatContext } from "../../contexts";
 import CloseIcon from "@mui/icons-material/Close";
 import ChatInputBar from "./ChatInputBar";
 import ChatMessage from "./ChatMessage";
+
 interface ChatPanelProps {
   close: () => void;
 }
 
 export default function ChatPanel({ close }: ChatPanelProps) {
+  const { messages } = React.useContext(ChatContext);
   return (
     <Paper
       style={{
@@ -25,28 +28,13 @@ export default function ChatPanel({ close }: ChatPanelProps) {
         <CloseIcon />
       </IconButton>
 
-      <main>
-        <div style={{ padding: 10 }}>
-          <ChatMessage
-            message={{
-              text: "Hey, how can I help you?",
-              role: "system",
-            }}
-            senderName="Gilbert Y."
-            isRight={false}
-          />
-          <ChatMessage
-            message={{
-              text: "How can I file my taxes?",
-              role: "user",
-            }}
-            senderName="Gilbert Y."
-            isRight={true}
-          />
-        </div>
+      <Box mt={6}>
+        {messages.map((message, index) => (
+          <ChatMessage key={message._id} message={message} />
+        ))}
 
         <ChatInputBar />
-      </main>
+      </Box>
     </Paper>
   );
 }

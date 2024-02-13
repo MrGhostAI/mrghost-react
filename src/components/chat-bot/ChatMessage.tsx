@@ -1,25 +1,13 @@
 import React from "react";
 import { Box, Divider, Typography } from "@mui/material";
+import { type Message } from "../../contexts";
 
-interface Message {
-  role: "system" | "user" | "bot";
-  text: string;
-}
 interface ChatMessageProps {
   message: Message;
-  isRight: boolean;
-  senderName: string;
 }
 
-export default function ChatMessage({
-  message,
-  isRight,
-  senderName,
-}: ChatMessageProps) {
-  //   const isRight = myRoles.includes(message.role || "");
-  //   const senderStyles = isRight ? styles.right : styles.left;
-  //   const capitalizedRoleName = capitalizeRoleName(message.role);
-  //   const senderName = message.sender?.name || capitalizedRoleName;
+export default function ChatMessage({ message }: ChatMessageProps) {
+  const isRight = message.role === "user";
   const leftCorner = { borderRadius: "24px 24px 24px 0px" };
   const rightCorner = { borderRadius: "24px 24px 0px 24px" };
   const bubbleStyle = isRight ? rightCorner : leftCorner;
@@ -36,7 +24,7 @@ export default function ChatMessage({
           color: "#000000",
         }}
       >
-        {message.role === "system" ? "System" : senderName}
+        {message.role === "system" ? "System" : message.sender.name}
       </Typography>
       <Box
         sx={{
