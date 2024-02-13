@@ -18,13 +18,16 @@ export interface Message {
   updatedAt: string;
   __v: number;
 }
+interface NewMessage extends Pick<Message, "text"> {
+  botId: string;
+  chatId: string;
+  chatUserId: string;
+}
 
 interface ChatProviderProps {
   botId: string;
-  isAdmin: boolean;
   chatId: string;
   chatUserId: string;
-  preview: boolean;
   children: React.ReactNode;
 }
 
@@ -37,6 +40,19 @@ export const ChatContext = React.createContext<ChatContextType>({
   messages: [],
   sendMessage: () => {},
 });
+
+const saveChatToLocalStorage = (
+  botId: string,
+  key: string,
+  messages: Message[]
+) => {
+  localStorage.setItem(`${botId}_${key}`, JSON.stringify(messages));
+};
+
+const getChatFromLocalStorage = (botId: string, key: string) => {
+  const chat = localStorage.getItem(`${botId}_${key}`);
+  return chat ? JSON.parse(chat) : [];
+};
 
 export const ChatProvider = ({
   botId,
@@ -66,31 +82,38 @@ export const ChatProvider = ({
   }, []);
 
   const sendMessage = (text: string) => {
-    socket?.emit("send_message", {
-      text,
-      botId,
-      chatId,
-      chatUserId,
-    });
+    console.log(
+      `BotId: ${botId}, ChatId: ${chatId}, ChatUserId: ${chatUserId}`
+    );
+    const message = socket?.emit(
+      "send_message",
+      {
+        text,
+        botId,
+        chatId,
+        chatUserId,
+      },
+      (message: any) => console.log("Message**", message)
+    );
+
+    console.log("message", message);
 
     // TODO: Remove hard coded values
-    const newMessage: Message = {
-      _id: Date.now().toString(),
-      chat: "string",
-      text,
-      role: "user",
-      sources: [],
-      payer: "string",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      __v: 0,
-      sender: {
-        _id: Date.now().toString(),
-        name: "Gilbert Young",
-      },
-    };
-    // Add the new message to the messages state
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    // const newMessage: NewMessage = {
+    //   text,
+    //   role: "user",
+    //   sources: [],
+    //   payer: "string",
+    //   createdAt: new Date().toISOString(),
+    //   updatedAt: new Date().toISOString(),
+    //   __v: 0,
+    //   sender: {
+    //     _id: Date.now().toString(),
+    //     name: "Gilbert Young",
+    //   },
+    // };
+    // // Add the new message to the messages state
+    // setMessages((prevMessages) => [...prevMessages, newMessage]);
   };
 
   return (
