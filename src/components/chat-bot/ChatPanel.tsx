@@ -1,6 +1,6 @@
 import React from "react";
 import { Paper, IconButton, Box, Typography } from "@mui/material";
-import { ChatContext, ActionContext } from "../../contexts";
+import { ChatContext } from "../../contexts";
 import CloseIcon from "@mui/icons-material/Close";
 import ChatInputBar from "./ChatInputBar";
 import ChatMessage from "./ChatMessage";
@@ -10,22 +10,15 @@ interface ChatPanelProps {
 }
 
 export default function ChatPanel({ close }: ChatPanelProps) {
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const { messages, isAiTyping } = React.useContext(ChatContext);
-  const { registerFunction, functions } = React.useContext(ActionContext);
 
-  const closeChat = () => {
-    console.log("Closing chat panel...");
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-  React.useEffect(() => {
-    registerFunction({
-      name: "closeChat",
-      description: "Close the chat panel",
-      parameters: {},
-      fn: closeChat,
-    });
-  }, []);
 
-  console.log(`functions: ${JSON.stringify(functions, null, 2)}`);
+  // Scroll to the bottom of the chat panel when new messages are added
+  React.useEffect(scrollToBottom, [messages]);
 
   return (
     <Paper
@@ -35,17 +28,28 @@ export default function ChatPanel({ close }: ChatPanelProps) {
         right: 16,
         height: 600,
         width: 400,
-        // overflowY: "auto",
+        overflowY: "auto",
       }}
     >
-      <IconButton
-        onClick={close}
-        sx={{ position: "absolute", top: 8, right: 8 }}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end", // Align to the right
+          position: "sticky",
+          marginTop: 1,
+          marginRight: 1,
+        }}
       >
-        <CloseIcon />
-      </IconButton>
+        <IconButton
+          onClick={close}
+          size="small"
+          sx={{ backgroundColor: "ButtonShadow" }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
-      <Box mt={4}>
+      <Box mb={10}>
         {messages.map((message, index) => (
           <ChatMessage key={index} message={message} />
         ))}
@@ -63,6 +67,8 @@ export default function ChatPanel({ close }: ChatPanelProps) {
             Customer Support is typing...
           </Typography>
         ) : null}
+        <div ref={messagesEndRef} />
+
         <ChatInputBar />
       </Box>
     </Paper>
