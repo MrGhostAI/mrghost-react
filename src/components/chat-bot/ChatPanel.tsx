@@ -33,11 +33,9 @@ export default function ChatPanel({ close }: ChatPanelProps) {
     >
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "flex-end", // Align to the right
-          position: "sticky",
+          position: "fixed",
           marginTop: 1,
-          marginRight: 1,
+          right: 25,
         }}
       >
         <IconButton
