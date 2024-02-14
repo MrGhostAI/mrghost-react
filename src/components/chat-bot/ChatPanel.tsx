@@ -1,6 +1,6 @@
 import React from "react";
 import { Paper, IconButton, Box, Typography } from "@mui/material";
-import { ChatContext } from "../../contexts";
+import { ChatContext, ActionContext } from "../../contexts";
 import CloseIcon from "@mui/icons-material/Close";
 import ChatInputBar from "./ChatInputBar";
 import ChatMessage from "./ChatMessage";
@@ -11,6 +11,21 @@ interface ChatPanelProps {
 
 export default function ChatPanel({ close }: ChatPanelProps) {
   const { messages, isAiTyping } = React.useContext(ChatContext);
+  const { registerFunction, functions } = React.useContext(ActionContext);
+
+  const closeChat = () => {
+    console.log("Closing chat panel...");
+  };
+  React.useEffect(() => {
+    registerFunction({
+      name: "closeChat",
+      description: "Close the chat panel",
+      parameters: {},
+      fn: closeChat,
+    });
+  }, []);
+
+  console.log(`functions: ${JSON.stringify(functions, null, 2)}`);
 
   return (
     <Paper
@@ -45,7 +60,7 @@ export default function ChatPanel({ close }: ChatPanelProps) {
               textAlign: "right",
             }}
           >
-            Customer Support Typing...
+            Customer Support is typing...
           </Typography>
         ) : null}
         <ChatInputBar />
