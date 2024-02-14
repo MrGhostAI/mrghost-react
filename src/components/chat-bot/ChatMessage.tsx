@@ -11,12 +11,13 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const leftCorner = { borderRadius: "24px 24px 24px 0px" };
   const rightCorner = { borderRadius: "24px 24px 0px 24px" };
   const bubbleStyle = isRight ? rightCorner : leftCorner;
-  const backgroundColor =
-    message.role === "system" ? "#f5f5f5" : "primary.main";
-  const color = message.role === "system" ? "#000000" : "#ffffff";
+  const backgroundColor = message.role === "ai" ? "#f5f5f5" : "primary.main";
+  const color = message.role === "ai" ? "#000000" : "#ffffff";
+
+  console.log(`Message in Chat: ${JSON.stringify(message, null, 2)}`);
 
   return (
-    <Box sx={{ textAlign: isRight ? "right" : "left" }}>
+    <Box sx={{ textAlign: isRight ? "right" : "left", padding: 2 }}>
       <Typography
         variant="caption"
         sx={{

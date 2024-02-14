@@ -29,7 +29,7 @@ export default function ChatPanel({ close }: ChatPanelProps) {
         <CloseIcon />
       </IconButton>
 
-      <Box mt={6}>
+      <Box mt={4}>
         {messages.map((message, index) => (
           <ChatMessage key={index} message={message} />
         ))}

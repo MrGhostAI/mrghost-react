@@ -10,7 +10,7 @@ export interface Message {
   _id: string;
   chat: string;
   sender: Sender;
-  role: "system" | "user" | "bot";
+  role: "system" | "user" | "ai";
   text: string;
   sources: string[];
   payer: string;
@@ -96,6 +96,26 @@ export const ChatProvider = ({
         setMessages((prevMessages) => [...prevMessages, message])
     );
   };
+
+  const getMessages = (message: Message) => {
+    setMessages((prevMessages) => {
+      // Check if the message is already in the list
+      // Assume that each message has a unique id property
+      if (
+        prevMessages.some((prevMessage) => {
+          return message._id === prevMessage._id;
+        })
+      ) {
+        // If the message is already in the list, return the list unmodified
+        return prevMessages;
+      } else {
+        // If the message is not in the list, add it
+        return [...prevMessages, message];
+      }
+    });
+  };
+
+  socket?.on("receive_message", getMessages);
 
   return (
     <ChatContext.Provider value={{ messages, sendMessage }}>
