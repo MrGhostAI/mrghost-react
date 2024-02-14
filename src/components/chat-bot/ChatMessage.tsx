@@ -7,15 +7,20 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message }: ChatMessageProps) {
-  const isRight = message.role === "user";
+  const isUser = message.role === "user";
   const leftCorner = { borderRadius: "24px 24px 24px 0px" };
   const rightCorner = { borderRadius: "24px 24px 0px 24px" };
-  const bubbleStyle = isRight ? rightCorner : leftCorner;
+  const bubbleStyle = isUser ? rightCorner : leftCorner;
   const backgroundColor = message.role === "ai" ? "#f5f5f5" : "primary.main";
   const color = message.role === "ai" ? "#000000" : "#ffffff";
 
   return (
-    <Box sx={{ textAlign: isRight ? "right" : "left", padding: 2 }}>
+    <Box
+      sx={{
+        marginLeft: isUser ? "auto" : "0", // Align user messages to the right
+        padding: 2,
+      }}
+    >
       <Typography
         variant="caption"
         sx={{
@@ -32,7 +37,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           ...styles.messageBubble,
           ...bubbleStyle,
           backgroundColor,
-          marginLeft: isRight ? "auto" : "0",
+          marginLeft: isUser ? "auto" : "0",
         }}
       >
         <Typography
