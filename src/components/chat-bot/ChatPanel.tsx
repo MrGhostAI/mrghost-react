@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, IconButton, Box } from "@mui/material";
+import { Paper, IconButton, Box, Typography } from "@mui/material";
 import { ChatContext } from "../../contexts";
 import CloseIcon from "@mui/icons-material/Close";
 import ChatInputBar from "./ChatInputBar";
@@ -10,7 +10,7 @@ interface ChatPanelProps {
 }
 
 export default function ChatPanel({ close }: ChatPanelProps) {
-  const { messages } = React.useContext(ChatContext);
+  const { messages, isAiTyping } = React.useContext(ChatContext);
 
   return (
     <Paper
@@ -20,6 +20,7 @@ export default function ChatPanel({ close }: ChatPanelProps) {
         right: 16,
         height: 600,
         width: 400,
+        // overflowY: "auto",
       }}
     >
       <IconButton
@@ -34,6 +35,19 @@ export default function ChatPanel({ close }: ChatPanelProps) {
           <ChatMessage key={index} message={message} />
         ))}
 
+        {isAiTyping ? (
+          <Typography
+            variant="caption"
+            sx={{
+              opacity: ".5",
+              margin: "0 15px",
+              color: "#000000",
+              textAlign: "right",
+            }}
+          >
+            Customer Support Typing...
+          </Typography>
+        ) : null}
         <ChatInputBar />
       </Box>
     </Paper>

@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Divider, Typography } from "@mui/material";
-import { type Message } from "../../contexts";
+import { Box, Typography } from "@mui/material";
+import { Message } from "../../contexts";
 
 interface ChatMessageProps {
   message: Message;
@@ -14,8 +14,6 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const backgroundColor = message.role === "ai" ? "#f5f5f5" : "primary.main";
   const color = message.role === "ai" ? "#000000" : "#ffffff";
 
-  console.log(`Message in Chat: ${JSON.stringify(message, null, 2)}`);
-
   return (
     <Box sx={{ textAlign: isRight ? "right" : "left", padding: 2 }}>
       <Typography
@@ -28,6 +26,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       >
         {message.role === "system" ? "System" : message?.sender?.name}
       </Typography>
+
       <Box
         sx={{
           ...styles.messageBubble,
@@ -36,15 +35,14 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           marginLeft: isRight ? "auto" : "0",
         }}
       >
-        <Divider>
-          <Typography
-            sx={{
-              color,
-            }}
-          >
-            {message.text}
-          </Typography>
-        </Divider>
+        <Typography
+          sx={{
+            color,
+            overflow: "hidden",
+          }}
+        >
+          {message.text}
+        </Typography>
       </Box>
     </Box>
   );

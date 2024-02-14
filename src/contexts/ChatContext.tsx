@@ -34,11 +34,13 @@ interface ChatProviderProps {
 interface ChatContextType {
   messages: Message[];
   sendMessage: (text: string) => void;
+  isAiTyping: boolean;
 }
 
 export const ChatContext = React.createContext<ChatContextType>({
   messages: [],
   sendMessage: () => {},
+  isAiTyping: false,
 });
 
 const saveChatToLocalStorage = (
@@ -62,6 +64,7 @@ export const ChatProvider = ({
 }: ChatProviderProps) => {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [socket, setSocket] = React.useState<Socket | null>(null);
+  const [isAiTyping, setAiTyping] = React.useState<boolean>(false);
 
   // Create a socket connection on component mount
   React.useEffect(() => {
@@ -116,9 +119,19 @@ export const ChatProvider = ({
   };
 
   socket?.on("receive_message", getMessages);
+  socket?.on("typing", ({ chatUser, isTyping }) => {
+    console.log("typing", chatUser, isTyping);
+    setAiTyping(isTyping ? true : false);
+
+    clearTimeout(100);
+    //set interval to false after 2 seconds
+    setInterval(() => {
+      setAiTyping(false);
+    }, 1000);
+  });
 
   return (
-    <ChatContext.Provider value={{ messages, sendMessage }}>
+    <ChatContext.Provider value={{ messages, sendMessage, isAiTyping }}>
       {children}
     </ChatContext.Provider>
   );
