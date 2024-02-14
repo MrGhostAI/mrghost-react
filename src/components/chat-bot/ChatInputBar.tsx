@@ -15,6 +15,16 @@ export default function ChatInputBar() {
     setText(""); // Clear the input field after submitting the message
   };
 
+  // Handle 'Enter' key press
+  const onEnterKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+
+      sendMessage(text); // Send the message to the server
+      setText(""); // Clear the input field after submitting the message
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -38,6 +48,7 @@ export default function ChatInputBar() {
             color: "#000",
           },
         }}
+        onKeyDown={onEnterKeyPress}
         onChange={(e) => setText(e.target.value)}
       />
       <Button variant="text" sx={styles.sendButton} type="submit">
