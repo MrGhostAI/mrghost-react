@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, TextField, Button } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
 import { ChatContext } from "../../contexts";
+import sendIcon from "../../assets/Send.svg";
 
 export default function ChatInputBar() {
   const [text, setText] = React.useState("");
@@ -10,17 +10,22 @@ export default function ChatInputBar() {
   // Form submission handler
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const trimmedText = text.trim();
 
-    sendMessage(text); // Send the message to the server
+    sendMessage(trimmedText); // Send the message to the server
     setText(""); // Clear the input field after submitting the message
   };
 
   // Handle 'Enter' key press
   const onEnterKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // handle guard
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
+
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
-      sendMessage(text); // Send the message to the server
+      sendMessage(trimmedText); // Send the message to the server
       setText(""); // Clear the input field after submitting the message
     }
   };
@@ -51,14 +56,22 @@ export default function ChatInputBar() {
         onKeyDown={onEnterKeyPress}
         onChange={(e) => setText(e.target.value)}
       />
-      <Button variant="text" sx={styles.sendButton} type="submit">
-        <SendIcon />
+      <Button
+        variant="text"
+        sx={styles.sendButton}
+        type="submit"
+        disabled={!text}
+      >
+        <img src={sendIcon} style={styles.sendIcon} alt="Send" />
       </Button>
     </Box>
   );
 }
 
 const styles = {
+  sendIcon: {
+    rotate: "45deg",
+  },
   sendButton: {
     cursor: "pointer",
     minHeight: "40px",
