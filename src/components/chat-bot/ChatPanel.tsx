@@ -11,6 +11,7 @@ interface ChatPanelProps {
 
 export default function ChatPanel({ close }: ChatPanelProps) {
   const { messages } = React.useContext(ChatContext);
+
   return (
     <Paper
       style={{
@@ -30,7 +31,7 @@ export default function ChatPanel({ close }: ChatPanelProps) {
 
       <Box mt={6}>
         {messages.map((message, index) => (
-          <ChatMessage key={message._id} message={message} />
+          <ChatMessage key={index} message={message} />
         ))}
 
         <ChatInputBar />

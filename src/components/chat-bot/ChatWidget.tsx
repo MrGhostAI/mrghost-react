@@ -10,11 +10,9 @@ export function ChatWidget() {
 
   return (
     <ChatProvider
-      botId=""
-      chatId=""
-      chatUserId=""
-      isAdmin={false}
-      preview={false}
+      botId="65b80bd8e0c7a0bb5501ca56"
+      chatUserId="65b807e2e0c7a0bb5501ca36"
+      chatId={null}
     >
       <ThemeProvider theme={HappyMLTheme}>
         <CssBaseline />

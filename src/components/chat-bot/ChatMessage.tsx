@@ -14,6 +14,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const backgroundColor =
     message.role === "system" ? "#f5f5f5" : "primary.main";
   const color = message.role === "system" ? "#000000" : "#ffffff";
+
   return (
     <Box sx={{ textAlign: isRight ? "right" : "left" }}>
       <Typography
@@ -24,7 +25,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           color: "#000000",
         }}
       >
-        {message.role === "system" ? "System" : message.sender.name}
+        {message.role === "system" ? "System" : message?.sender?.name}
       </Typography>
       <Box
         sx={{

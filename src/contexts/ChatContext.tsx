@@ -12,7 +12,7 @@ export interface Message {
   sender: Sender;
   role: "system" | "user" | "bot";
   text: string;
-  sources: string[]; // TODO: Confirm w/ Evan what sources are
+  sources: string[];
   payer: string;
   createdAt: string;
   updatedAt: string;
@@ -20,13 +20,13 @@ export interface Message {
 }
 interface NewMessage extends Pick<Message, "text"> {
   botId: string;
-  chatId: string;
+  chatId: string | null;
   chatUserId: string;
 }
 
 interface ChatProviderProps {
   botId: string;
-  chatId: string;
+  chatId: string | null;
   chatUserId: string;
   children: React.ReactNode;
 }
@@ -82,10 +82,7 @@ export const ChatProvider = ({
   }, []);
 
   const sendMessage = (text: string) => {
-    console.log(
-      `BotId: ${botId}, ChatId: ${chatId}, ChatUserId: ${chatUserId}`
-    );
-    const message = socket?.emit(
+    socket?.emit(
       "send_message",
       {
         text,
@@ -93,27 +90,11 @@ export const ChatProvider = ({
         chatId,
         chatUserId,
       },
-      (message: any) => console.log("Message**", message)
+
+      (message: Message) =>
+        // Add new message to the state
+        setMessages((prevMessages) => [...prevMessages, message])
     );
-
-    console.log("message", message);
-
-    // TODO: Remove hard coded values
-    // const newMessage: NewMessage = {
-    //   text,
-    //   role: "user",
-    //   sources: [],
-    //   payer: "string",
-    //   createdAt: new Date().toISOString(),
-    //   updatedAt: new Date().toISOString(),
-    //   __v: 0,
-    //   sender: {
-    //     _id: Date.now().toString(),
-    //     name: "Gilbert Young",
-    //   },
-    // };
-    // // Add the new message to the messages state
-    // setMessages((prevMessages) => [...prevMessages, newMessage]);
   };
 
   return (
