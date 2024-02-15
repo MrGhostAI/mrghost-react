@@ -56,6 +56,11 @@ const getChatFromLocalStorage = (botId: string, key: string) => {
   return chat ? JSON.parse(chat) : [];
 };
 
+const WEB_SOCKET_API_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000/chat"
+    : "https://www.happyml.com/chat";
+
 export const ChatProvider = ({
   botId,
   chatId,
@@ -68,7 +73,7 @@ export const ChatProvider = ({
 
   // Create a socket connection on component mount
   React.useEffect(() => {
-    const _socket = io("http://localhost:3000/chat");
+    const _socket = io(WEB_SOCKET_API_URL);
 
     // If the socket connection is successful, set the socket state
     if (_socket) {
@@ -83,6 +88,11 @@ export const ChatProvider = ({
       setSocket(null);
     };
   }, []);
+
+  // TODO: Load chat history from the server
+  // React.useEffect(() => {
+  //   socket?.emit("join_chat", {});
+  // }, [socket, chatId, botId, chatUserId]);
 
   const sendMessage = (text: string) => {
     socket?.emit(
