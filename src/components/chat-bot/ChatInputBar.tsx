@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import { ChatContext } from "../../contexts";
-import sendIcon from "../../assets/Send.svg";
+import SendIcon from "@mui/icons-material/Send";
 
 export default function ChatInputBar() {
-  const [text, setText] = React.useState("");
-  const { sendMessage } = React.useContext(ChatContext);
+  const [text, setText] = useState("");
+  const { sendMessage } = useContext(ChatContext);
 
   // Form submission handler
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -62,16 +62,13 @@ export default function ChatInputBar() {
         type="submit"
         disabled={!text}
       >
-        <img src={sendIcon} style={styles.sendIcon} alt="Send" />
+        <SendIcon />
       </Button>
     </Box>
   );
 }
 
 const styles = {
-  sendIcon: {
-    rotate: "45deg",
-  },
   sendButton: {
     cursor: "pointer",
     minHeight: "40px",

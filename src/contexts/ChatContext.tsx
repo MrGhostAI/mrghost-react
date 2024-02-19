@@ -18,11 +18,6 @@ export interface Message {
   updatedAt: string;
   __v: number;
 }
-interface NewMessage extends Pick<Message, "text"> {
-  botId: string;
-  chatId: string | null;
-  chatUserId: string;
-}
 
 interface ChatProviderProps {
   botId: string;
@@ -43,23 +38,24 @@ export const ChatContext = React.createContext<ChatContextType>({
   isAiTyping: false,
 });
 
-const saveChatToLocalStorage = (
-  botId: string,
-  key: string,
-  messages: Message[]
-) => {
-  localStorage.setItem(`${botId}_${key}`, JSON.stringify(messages));
-};
+// const saveChatToLocalStorage = (
+//   botId: string,
+//   key: string,
+//   messages: Message[]
+// ) => {
+//   localStorage.setItem(`${botId}_${key}`, JSON.stringify(messages));
+// };
 
-const getChatFromLocalStorage = (botId: string, key: string) => {
-  const chat = localStorage.getItem(`${botId}_${key}`);
-  return chat ? JSON.parse(chat) : [];
-};
+// const getChatFromLocalStorage = (botId: string, key: string) => {
+//   const chat = localStorage.getItem(`${botId}_${key}`);
+//   return chat ? JSON.parse(chat) : [];
+// };
 
-const WEB_SOCKET_API_URL =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/chat"
-    : "https://www.happyml.com/chat";
+const WEB_SOCKET_API_URL = "http://localhost:3000/chat";
+// const WEB_SOCKET_API_URL =
+//   process.env.NODE_ENV === "development"
+//     ? "http://localhost:3000/chat"
+//     : "https://www.happyml.com/chat";
 
 export const ChatProvider = ({
   botId,
@@ -70,6 +66,8 @@ export const ChatProvider = ({
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [isAiTyping, setAiTyping] = React.useState<boolean>(false);
+
+  console.log(`Messages in context: ${messages.length}`);
 
   // Create a socket connection on component mount
   React.useEffect(() => {

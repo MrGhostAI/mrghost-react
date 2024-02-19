@@ -45,6 +45,8 @@ export const ActionProvider: FunctionComponent<ActionProviderProps> = ({
 }) => {
   const [functions, setFunctions] = useState<FunctionDetails[]>([]);
 
+  console.log(`functions in context: ${functions}`);
+
   const registerFunction = (fn: FunctionDetails) => {
     setFunctions((prevFunctions) => [...prevFunctions, fn]);
   };

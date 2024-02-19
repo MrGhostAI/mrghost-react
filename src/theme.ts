@@ -20,6 +20,7 @@ export const HappyMLTheme = createTheme({
       main: secondaryColor, // Change the secondary color to orange (#ff5722)
       contrastText: "#000",
     },
+    // @ts-ignore
     tertiary: {
       main: "#dd5a33",
       contrastText: "#fff",
@@ -169,6 +170,8 @@ export const HappyMLTheme = createTheme({
         variant: "contained", // For instance, make every button "contained" by default
       },
     },
+    // @ts-ignore
+
     DefaultChatStyles: defaultChatStyles,
   },
 });
@@ -210,8 +213,12 @@ export const HappyMLDarkTheme = createTheme({
     },
     background: {
       default: darkBackground,
+      // @ts-ignore
+
       light: darkBackgroundLight,
     },
+    // @ts-ignore
+
     divider: {
       main: darkBackgroundDarker,
       default: darkBackgroundDarker,
@@ -222,6 +229,8 @@ export const HappyMLDarkTheme = createTheme({
     },
     action: {
       active: "#EEE",
+      // @ts-ignore
+
       secondary: "#CCC",
     },
     linkMenu: {
@@ -230,6 +239,8 @@ export const HappyMLDarkTheme = createTheme({
   },
   typography: {
     fontFamily: "Roboto, sans-serif", // Change the default font-family to "Work Sans"
+    // @ts-ignore
+
     color: "#EEE",
     h1: {
       fontSize: "3rem",
@@ -334,6 +345,8 @@ export const HappyMLDarkTheme = createTheme({
         variant: "contained", // For instance, make every button "contained" by default
       },
     },
+    // @ts-ignore
+
     AdminChatStyles: {
       primaryColor: "#059169",
       secondaryColor: darkBackground,

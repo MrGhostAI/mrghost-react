@@ -18,7 +18,9 @@ export default function ChatPanel({ close }: ChatPanelProps) {
   };
 
   // Scroll to the bottom of the chat panel when new messages are added
-  React.useEffect(scrollToBottom, [messages]);
+  React.useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <Paper
@@ -47,7 +49,7 @@ export default function ChatPanel({ close }: ChatPanelProps) {
         </IconButton>
       </Box>
 
-      <Box mb={10}>
+      <Box mb={10} mt={2}>
         {messages.map((message, index) => (
           <ChatMessage key={index} message={message} />
         ))}
