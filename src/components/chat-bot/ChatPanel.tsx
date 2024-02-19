@@ -23,47 +23,20 @@ export default function ChatPanel({ close }: ChatPanelProps) {
   }, [messages]);
 
   return (
-    <Paper
-      style={{
-        position: "fixed",
-        bottom: 10,
-        right: 16,
-        height: 600,
-        width: 400,
-        overflowY: "auto",
-      }}
-    >
-      <Box
-        sx={{
-          position: "fixed",
-          marginTop: 1,
-          right: 25,
-        }}
-      >
-        <IconButton
-          onClick={close}
-          size="small"
-          sx={{ backgroundColor: "ButtonShadow" }}
-        >
+    <Paper sx={styles.chatPanel}>
+      <Box sx={styles.chatHeader} bgcolor="primary.main">
+        <IconButton onClick={close} size="small" sx={styles.closeIcon}>
           <CloseIcon />
         </IconButton>
       </Box>
 
-      <Box mb={10} mt={2}>
+      <Box mb={10}>
         {messages.map((message, index) => (
           <ChatMessage key={index} message={message} />
         ))}
 
         {isAiTyping ? (
-          <Typography
-            variant="caption"
-            sx={{
-              opacity: ".5",
-              margin: "0 15px",
-              color: "#000000",
-              textAlign: "right",
-            }}
-          >
+          <Typography variant="caption" sx={styles.placeholder}>
             Customer Support is typing...
           </Typography>
         ) : null}
@@ -74,3 +47,32 @@ export default function ChatPanel({ close }: ChatPanelProps) {
     </Paper>
   );
 }
+
+const styles = {
+  chatPanel: {
+    position: "fixed",
+    bottom: 10,
+    right: 16,
+    height: 600,
+    width: 400,
+    overflowY: "auto",
+  },
+  chatHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 3,
+    borderBottom: "1px solid #ccc",
+  },
+  closeIcon: {
+    color: "#fff",
+    position: "fixed",
+    right: 25,
+  },
+  placeholder: {
+    opacity: ".5",
+    margin: "0 15px",
+    color: "#000000",
+    textAlign: "right",
+  },
+};

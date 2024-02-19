@@ -5,16 +5,28 @@ import { ChatProvider, ActionProvider } from "../../contexts";
 import ChatPanel from "./ChatPanel";
 import ChatBubble from "./ChatBubble";
 
-export function ChatWidget() {
+export interface ChatWidgetProps {
+  /**
+   * The bot id to use for the chat.
+   */
+  botId: string;
+  /**
+   * The user id to use for the chat.
+   */
+  chatUserId: string;
+}
+
+/**
+ * A widget that can be used to add a chat bot to a website.
+ * @param botId The bot id to use for the chat.
+ * @param chatUserId The user id to use for the chat.
+ */
+export function ChatWidget({ botId, chatUserId }: ChatWidgetProps) {
   const [isBotInitialized, setBotInitialized] = useState<boolean>(false);
 
   return (
     <ActionProvider>
-      <ChatProvider
-        botId="65b80bd8e0c7a0bb5501ca56"
-        chatUserId="65b807e2e0c7a0bb5501ca36"
-        chatId={null}
-      >
+      <ChatProvider botId={botId} chatUserId={chatUserId} chatId={null}>
         <ThemeProvider theme={HappyMLTheme}>
           <CssBaseline />
           {isBotInitialized ? (
