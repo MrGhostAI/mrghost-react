@@ -30,7 +30,7 @@ export default function ChatPanel({ close }: ChatPanelProps) {
         </IconButton>
       </Box>
 
-      <Box mb={10}>
+      <Box mb={10} mt={4}>
         {messages.map((message, index) => (
           <ChatMessage key={index} message={message} />
         ))}
@@ -63,6 +63,10 @@ const styles = {
     alignItems: "center",
     padding: 3,
     borderBottom: "1px solid #ccc",
+    position: "fixed",
+    width: 400,
+    borderRadius: "5px 5px 0 0",
+    zIndex: 10,
   },
   closeIcon: {
     color: "#fff",
