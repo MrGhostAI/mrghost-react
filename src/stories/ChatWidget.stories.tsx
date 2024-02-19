@@ -11,7 +11,9 @@ export default meta;
 type Story = StoryObj<typeof ChatWidget>;
 
 export const FirstStory: Story = {
+  // harded code values for now 😬
   args: {
-    //👇 The args you need here will depend on your component
+    botId: "65b80bd8e0c7a0bb5501ca56",
+    chatUserId: "65b807e2e0c7a0bb5501ca36",
   },
 };
