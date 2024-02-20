@@ -2,23 +2,19 @@
 
 This package enables the execution of browser side actions for a HappyML chatbot.
 
-## Installation
-
-You can install the package using npm:
+### Installation
 
 ```bash
 npm install @happyml/browser-side-actions
 ```
 
-## Usage
-
-Importing the module:
+### Usage
 
 ```javascript
 import { ChatWidget } from "@happyml/browser-side-actions";
 ```
 
-## Example
+### Example
 
 ```javascript
 import React from "react";
@@ -31,7 +27,7 @@ function App() {
 }
 ```
 
-## ChatWidget Properties
+### ChatWidget Properties
 
 | Property | Type     | Required | Description                                                                       |
 | -------- | -------- | -------- | --------------------------------------------------------------------------------- |
