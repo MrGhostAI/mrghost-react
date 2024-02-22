@@ -1,7 +1,7 @@
 import React from "react";
 import io, { Socket } from "socket.io-client";
 
-interface Sender {
+export interface Sender {
   _id: string;
   name: string;
 }
@@ -19,14 +19,14 @@ export interface Message {
   __v: number;
 }
 
-interface ChatProviderProps {
+export interface ChatProviderProps {
   botId: string;
   chatId: string | null;
   chatUserId: string;
   children: React.ReactNode;
 }
 
-interface ChatContextType {
+export interface ChatContextType {
   messages: Message[];
   sendMessage: (text: string) => void;
   isAiTyping: boolean;
@@ -66,8 +66,6 @@ export const ChatProvider = ({
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [isAiTyping, setAiTyping] = React.useState<boolean>(false);
-
-  console.log(`Messages in context: ${messages.length}`);
 
   // Create a socket connection on component mount
   React.useEffect(() => {
@@ -127,8 +125,7 @@ export const ChatProvider = ({
   };
 
   socket?.on("receive_message", getMessages);
-  socket?.on("typing", ({ chatUser, isTyping }) => {
-    console.log("typing", chatUser, isTyping);
+  socket?.on("typing", ({ isTyping }) => {
     setAiTyping(isTyping ? true : false);
 
     clearTimeout(100);

@@ -1,11 +1,19 @@
 {
   "name": "@happyml/browser-side-actions",
-  "version": "0.3.6",
+  "version": "0.4.0",
   "authors": [
     "Gilbert Young Jr.",
     "Evan Phibbs"
   ],
+  "keywords": [
+    "ai",
+    "chatbot"
+  ],
   "description": "A library for creating and managing happyml browser side actions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HappyMLGhost/browser-side-actions"
+  },
   "private": false,
   "main": "dist/bundle.js",
   "module": "dist/bundle.js",

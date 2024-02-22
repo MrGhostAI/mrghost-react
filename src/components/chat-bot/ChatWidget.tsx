@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { HappyMLTheme } from "../../theme";
-import { ChatProvider, ActionProvider } from "../../contexts";
+import { ChatProvider } from "../../contexts";
 import ChatPanel from "./ChatPanel";
 import ChatBubble from "./ChatBubble";
 
@@ -25,17 +25,15 @@ export function ChatWidget({ botId, chatUserId }: ChatWidgetProps) {
   const [isBotInitialized, setBotInitialized] = useState<boolean>(false);
 
   return (
-    <ActionProvider>
-      <ChatProvider botId={botId} chatUserId={chatUserId} chatId={null}>
-        <ThemeProvider theme={HappyMLTheme}>
-          <CssBaseline />
-          {isBotInitialized ? (
-            <ChatPanel close={() => setBotInitialized(false)} />
-          ) : (
-            <ChatBubble initializeChatBot={() => setBotInitialized(true)} />
-          )}
-        </ThemeProvider>
-      </ChatProvider>
-    </ActionProvider>
+    <ChatProvider botId={botId} chatUserId={chatUserId} chatId={null}>
+      <ThemeProvider theme={HappyMLTheme}>
+        <CssBaseline />
+        {isBotInitialized ? (
+          <ChatPanel close={() => setBotInitialized(false)} />
+        ) : (
+          <ChatBubble initializeChatBot={() => setBotInitialized(true)} />
+        )}
+      </ThemeProvider>
+    </ChatProvider>
   );
 }

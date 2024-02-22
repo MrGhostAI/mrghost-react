@@ -21,8 +21,6 @@ import React from "react";
 import { ChatWidget } from "@happyml/browser-side-actions";
 
 function App() {
-  const notify = () => toast("Wow so easy!");
-
   return <ChatWidget botId="your-bot-id" chatId="your-chat-id" />;
 }
 ```

@@ -5,7 +5,7 @@ import React, {
   ReactNode,
 } from "react";
 
-interface FunctionDetails {
+export interface FunctionDetails {
   /**
    * The name of the function.
    */
@@ -25,8 +25,21 @@ interface FunctionDetails {
 }
 
 interface ActionContextType {
+  /**
+   * The list of functions that have been registered.
+   */
   functions: FunctionDetails[];
+  /**
+   * Register a new function.
+   * @param fnDetails - The details of the function to register.
+   * @returns
+   */
   registerFunction: (fnDetails: FunctionDetails) => void;
+  /**
+   * Deregsiter a function.
+   * @param name - The name of the function to deregister.
+   * @returns
+   */
   deregisterFunction: (name: string) => void;
 }
 
@@ -40,6 +53,9 @@ interface ActionProviderProps {
   children: ReactNode;
 }
 
+/**
+ * A provider that allows users to register/de-register custom functions for use in the chat bot.
+ */
 export const ActionProvider: FunctionComponent<ActionProviderProps> = ({
   children,
 }) => {
