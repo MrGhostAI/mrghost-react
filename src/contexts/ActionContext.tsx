@@ -5,6 +5,16 @@ import React, {
   ReactNode,
 } from "react";
 
+export interface ParametersSchema {
+  type: string;
+  properties: {
+    [key: string]: {
+      type: string;
+      description: string;
+    };
+  };
+}
+
 export interface FunctionDetails {
   /**
    * The name of the function.
@@ -17,7 +27,7 @@ export interface FunctionDetails {
   /**
    * The parameters that the function accepts.
    */
-  parameters: Object;
+  parameters: ParametersSchema;
   /**
    * The function to be executed.
    */
@@ -61,8 +71,6 @@ export const ActionProvider: FunctionComponent<ActionProviderProps> = ({
 }) => {
   const [functions, setFunctions] = useState<FunctionDetails[]>([]);
 
-  console.log(`functions in context: ${functions}`);
-
   const registerFunction = (fn: FunctionDetails) => {
     setFunctions((prevFunctions) => [...prevFunctions, fn]);
   };
@@ -72,6 +80,7 @@ export const ActionProvider: FunctionComponent<ActionProviderProps> = ({
       prevFunctions.filter((func) => func.name !== name)
     );
   };
+
   return (
     <ActionContext.Provider
       value={{ functions, registerFunction, deregisterFunction }}
