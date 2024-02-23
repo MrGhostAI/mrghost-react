@@ -1,5 +1,12 @@
 import React from "react";
 import io, { Socket } from "socket.io-client";
+import { ActionContext } from "./ActionContext";
+
+interface SavedChatMessage {
+  chatId: string;
+  chatUserId: string;
+  messages: Message[];
+}
 
 export interface Sender {
   _id: string;
@@ -38,18 +45,13 @@ export const ChatContext = React.createContext<ChatContextType>({
   isAiTyping: false,
 });
 
-// const saveChatToLocalStorage = (
-//   botId: string,
-//   key: string,
-//   messages: Message[]
-// ) => {
-//   localStorage.setItem(`${botId}_${key}`, JSON.stringify(messages));
-// };
+const saveChatToLocalStorage = (botId: string, key: string, data: string) => {
+  localStorage.setItem(`${botId}_${key}`, data);
+};
 
-// const getChatFromLocalStorage = (botId: string, key: string) => {
-//   const chat = localStorage.getItem(`${botId}_${key}`);
-//   return chat ? JSON.parse(chat) : [];
-// };
+const getChatFromLocalStorage = (botId: string, key: string) => {
+  return localStorage.getItem(`${botId}_${key}`);
+};
 
 const WEB_SOCKET_API_URL = "http://localhost:3000/chat";
 // const WEB_SOCKET_API_URL =
@@ -66,6 +68,11 @@ export const ChatProvider = ({
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [isAiTyping, setAiTyping] = React.useState<boolean>(false);
+  const { functions } = React.useContext(ActionContext);
+
+  console.log(
+    `functions in chat context: ${JSON.stringify(functions, null, 2)}`
+  );
 
   // Create a socket connection on component mount
   React.useEffect(() => {
@@ -85,19 +92,34 @@ export const ChatProvider = ({
     };
   }, []);
 
-  // TODO: Load chat history from the server
-  // React.useEffect(() => {
-  //   socket?.emit("join_chat", {});
-  // }, [socket, chatId, botId, chatUserId]);
+  // Load chat history from the server
+  React.useEffect(() => {
+    socket?.emit(
+      "join_chat",
+      {
+        incomingBotId: botId,
+        incomingChatId: chatId,
+        incomingChatUserId: chatUserId,
+      },
+      (data: SavedChatMessage) => {
+        setMessages(data.messages);
+        saveChatToLocalStorage(botId, "chatUserId", data.chatUserId || "");
+        saveChatToLocalStorage(botId, "chatId", data.chatId || "");
+      }
+    );
+  }, [socket, chatId, botId, chatUserId]);
 
   const sendMessage = (text: string) => {
+    const savedChatUserId = getChatFromLocalStorage(botId, "chatUserId");
+    const savedChatId = getChatFromLocalStorage(botId, "chatId");
     socket?.emit(
       "send_message",
       {
         text,
         botId,
-        chatId,
-        chatUserId,
+        chatId: savedChatId ?? chatId,
+        chatUserId: savedChatUserId ?? chatUserId,
+        additionalFunctions: functions, // Dont know if this will work, worth a try
       },
 
       (message: Message) =>
@@ -124,7 +146,16 @@ export const ChatProvider = ({
     });
   };
 
+  socket?.on("call_action", (data) => {
+    console.log("call_action", data);
+  });
+
   socket?.on("receive_message", getMessages);
+
+  socket?.on("error", (error) => {
+    // TODO: replace with toast notif
+    alert(JSON.stringify(error, null, 2));
+  });
   socket?.on("typing", ({ isTyping }) => {
     setAiTyping(isTyping ? true : false);
 
