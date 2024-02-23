@@ -17,19 +17,19 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   return (
     <Box
       sx={{
-        marginLeft: isUser ? "auto" : "0", // Align user messages to the right
         padding: 2,
+        marginLeft: isUser ? "auto" : "0", // Align entire box to the right if user
+        textAlign: isUser ? "right" : "left", // Align sender's name and message within the box
       }}
     >
       <Typography
         variant="caption"
         sx={{
           opacity: ".5",
-          margin: "0 15px",
           color: "#000000",
         }}
       >
-        {message.role === "system" ? "System" : message?.sender?.name}
+        {message?.sender?.name}
       </Typography>
 
       <Box
@@ -37,7 +37,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           ...styles.messageBubble,
           ...bubbleStyle,
           backgroundColor,
-          marginLeft: isUser ? "auto" : "0",
+          marginLeft: isUser ? "auto" : "0", // Align entire box to the right if user
         }}
       >
         <Typography
