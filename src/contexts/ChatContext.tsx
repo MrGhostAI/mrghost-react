@@ -70,10 +70,6 @@ export const ChatProvider = ({
   const [isAiTyping, setAiTyping] = React.useState<boolean>(false);
   const { functions } = React.useContext(ActionContext);
 
-  console.log(
-    `functions in chat context: ${JSON.stringify(functions, null, 2)}`
-  );
-
   // Create a socket connection on component mount
   React.useEffect(() => {
     const _socket = io(WEB_SOCKET_API_URL);
@@ -83,10 +79,57 @@ export const ChatProvider = ({
       _socket.on("connect", () => {
         setSocket(_socket);
       });
+      
+      _socket?.on("call_action", (data) => {
+        console.log("call_action", data);
+      });
+
+      _socket?.on("receive_message", getMessages);
+
+      _socket?.on("error", (error) => {
+        // TODO: replace with toast notif
+        alert(JSON.stringify(error, null, 2));
+      });
+      _socket?.on("typing", ({ isTyping }) => {
+        setAiTyping(isTyping ? true : false);
+
+        clearTimeout(100);
+        //set interval to false after 2 seconds
+        setInterval(() => {
+          setAiTyping(false);
+        }, 1000);
+      });
+
+      _socket?.on("receive_message_fragment", (message: Message) => {
+        console.log("receive_message_fragment", message.text);
+        setMessages((prevMessages) => {
+          let index = prevMessages.findIndex((prevMessage) => {
+            return message._id === prevMessage._id;
+          });
+          console.log("index", index);
+          let newMessages: Message[] = [];
+          if (index === -1) {
+            // create new message
+            newMessages = [...prevMessages, message];
+          } else {
+            // update message
+            newMessages = [...prevMessages];
+            console.log("newMessages[index].text", newMessages[index].text);
+            newMessages[index].text += message.text;
+          }
+          return newMessages;
+        });
+      });
     }
 
     // Kill the socket connection on component unmount and reset the socket state
     return () => {
+      _socket.off("connect");
+      _socket.off("receive_message");
+      _socket.off("error");
+      _socket.off("typing");
+      _socket.off("receive_message_fragment");
+      _socket.off("call_action");
       _socket.disconnect();
       setSocket(null);
     };
@@ -148,26 +191,6 @@ export const ChatProvider = ({
       }
     });
   };
-
-  socket?.on("call_action", (data) => {
-    console.log("call_action", data);
-  });
-
-  socket?.on("receive_message", getMessages);
-
-  socket?.on("error", (error) => {
-    // TODO: replace with toast notif
-    alert(JSON.stringify(error, null, 2));
-  });
-  socket?.on("typing", ({ isTyping }) => {
-    setAiTyping(isTyping ? true : false);
-
-    clearTimeout(100);
-    //set interval to false after 2 seconds
-    setInterval(() => {
-      setAiTyping(false);
-    }, 1000);
-  });
 
   return (
     <ChatContext.Provider value={{ messages, sendMessage, isAiTyping }}>
