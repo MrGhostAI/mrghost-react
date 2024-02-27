@@ -15,6 +15,13 @@ export interface ParametersSchema {
   };
 }
 
+export interface ActionResponse {
+  action: string;
+  params: {
+    [key: string]: string;
+  };
+}
+
 export interface FunctionDetails {
   /**
    * The name of the function.
@@ -88,4 +95,16 @@ export const ActionProvider: FunctionComponent<ActionProviderProps> = ({
       {children}
     </ActionContext.Provider>
   );
+};
+
+/**
+ * A hook that allows users to access to states in the actions.
+ * @returns An action context store.
+ */
+export const useAction = () => {
+  const context = React.useContext(ActionContext);
+  if (!context) {
+    throw new Error("useAction must be used within an ActionProvider");
+  }
+  return context;
 };

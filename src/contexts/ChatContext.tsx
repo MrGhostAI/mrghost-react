@@ -1,6 +1,6 @@
 import React from "react";
 import io, { Socket } from "socket.io-client";
-import { ActionContext } from "./ActionContext";
+import { ActionContext, ActionResponse } from "./ActionContext";
 
 interface SavedChatMessage {
   chatId: string;
@@ -79,10 +79,6 @@ export const ChatProvider = ({
       _socket.on("connect", () => {
         setSocket(_socket);
       });
-      
-      _socket?.on("call_action", (data) => {
-        console.log("call_action", data);
-      });
 
       _socket?.on("receive_message", getMessages);
 
@@ -101,12 +97,10 @@ export const ChatProvider = ({
       });
 
       _socket?.on("receive_message_fragment", (message: Message) => {
-        console.log("receive_message_fragment", message.text);
         setMessages((prevMessages) => {
           let index = prevMessages.findIndex((prevMessage) => {
             return message._id === prevMessage._id;
           });
-          console.log("index", index);
           let newMessages: Message[] = [];
           if (index === -1) {
             // create new message
@@ -114,7 +108,6 @@ export const ChatProvider = ({
           } else {
             // update message
             newMessages = [...prevMessages];
-            console.log("newMessages[index].text", newMessages[index].text);
             newMessages[index].text += message.text;
           }
           return newMessages;
@@ -129,7 +122,6 @@ export const ChatProvider = ({
       _socket.off("error");
       _socket.off("typing");
       _socket.off("receive_message_fragment");
-      _socket.off("call_action");
       _socket.disconnect();
       setSocket(null);
     };
@@ -152,12 +144,32 @@ export const ChatProvider = ({
     );
   }, [socket, chatId, botId, chatUserId]);
 
+  React.useEffect(() => {
+    socket?.on("call_action", (response: ActionResponse, callback) => {
+      const { action, params } = response;
+      const selectedFunction = functions.find((fn) => fn.name === action);
+
+      if (!selectedFunction) {
+        console.error(`No action found with the name: ${action}`);
+        return;
+      }
+
+      const { fn } = selectedFunction;
+      const result = fn(params?.name);
+
+      callback(result);
+    });
+
+    // Clean up the event listener
+    return () => {
+      socket?.off("call_action");
+    };
+  }, [socket, functions]);
+
   const sendMessage = (text: string) => {
     const savedChatUserId = getChatFromLocalStorage(botId, "chatUserId");
     const savedChatId = getChatFromLocalStorage(botId, "chatId");
-    console.log(
-      `Saving custom functions: ${functions?.map((f) => f.name).join(", ")}`
-    );
+
     socket?.emit(
       "send_message",
       {

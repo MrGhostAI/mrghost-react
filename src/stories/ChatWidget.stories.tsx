@@ -2,10 +2,15 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { ChatWidget } from "../components";
-import { ActionContext, ActionProvider} from "../contexts/index";
+import { ActionContext, ActionProvider } from "../contexts/index";
 
-function ChatActionStory({ botId, chatUserId }: { botId: string; chatUserId: string }) {
-
+function ChatActionStory({
+  botId,
+  chatUserId,
+}: {
+  botId: string;
+  chatUserId: string;
+}) {
   return (
     <ActionProvider>
       <WidgetStory botId={botId} chatUserId={chatUserId} />
@@ -13,14 +18,20 @@ function ChatActionStory({ botId, chatUserId }: { botId: string; chatUserId: str
   );
 }
 
-function WidgetStory({ botId, chatUserId }: { botId: string; chatUserId: string }) {
-  const {registerFunction} = React.useContext(ActionContext);
+function WidgetStory({
+  botId,
+  chatUserId,
+}: {
+  botId: string;
+  chatUserId: string;
+}) {
+  const { registerFunction } = React.useContext(ActionContext);
   React.useEffect(() => {
     console.log("registering function...");
     registerFunction({
       name: "greet",
-      fn: () => {
-        console.log("Hello, world!");
+      fn: (name: string) => {
+        console.log(`Hello, ${name}!`);
       },
       parameters: {
         type: "object",
