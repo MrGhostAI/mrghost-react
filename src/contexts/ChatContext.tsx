@@ -112,6 +112,9 @@ export const ChatProvider = ({
   const sendMessage = (text: string) => {
     const savedChatUserId = getChatFromLocalStorage(botId, "chatUserId");
     const savedChatId = getChatFromLocalStorage(botId, "chatId");
+    console.log(
+      `Saving custom functions: ${functions?.map((f) => f.name).join(", ")}`
+    );
     socket?.emit(
       "send_message",
       {
@@ -119,7 +122,7 @@ export const ChatProvider = ({
         botId,
         chatId: savedChatId ?? chatId,
         chatUserId: savedChatUserId ?? chatUserId,
-        additionalFunctions: functions, // Dont know if this will work, worth a try
+        additionalFunctions: functions,
       },
 
       (message: Message) =>
