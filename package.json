@@ -1,7 +1,7 @@
 {
   "package-name": "mrghost",
   "name": "mrghost",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "authors": [
     "Evan Phibbs"
   ],
@@ -14,7 +14,8 @@
     "mister ghost",
     "mr. ghost",
     "ai ghost",
-    "ghost ai"
+    "ghost ai",
+    "ghost"
   ],
   "description": "A library for creating and managing Mr. Ghost AI applications and browser actions",
   "repository": {
