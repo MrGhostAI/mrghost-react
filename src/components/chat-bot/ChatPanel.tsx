@@ -55,7 +55,7 @@ const styles = {
     right: 16,
     height: 600,
     width: 400,
-    overflowY: "auto",
+    overflow: "hidden",
   },
   chatHeader: {
     display: "flex",

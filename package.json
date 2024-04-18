@@ -1,18 +1,19 @@
 {
-  "name": "@happyml/browser-side-actions",
-  "version": "0.4.4",
+  "package-name": "mrghost",
+  "name": "mrghost",
+  "version": "0.0.1",
   "authors": [
-    "Gilbert Young Jr.",
     "Evan Phibbs"
   ],
   "keywords": [
     "ai",
-    "chatbot"
+    "chatbot",
+    "generative ui"
   ],
-  "description": "A library for creating and managing happyml browser side actions",
+  "description": "A library for creating and managing Mr. Ghost AI applications and browser actions",
   "repository": {
     "type": "git",
-    "url": "https://github.com/HappyMLGhost/browser-side-actions"
+    "url": "https://github.com/MrGhostAI/mrghost-react"
   },
   "private": false,
   "main": "dist/bundle.js",
@@ -51,7 +52,7 @@
     "postcss": "^8.4.35",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "^3.0.1",
+    "react-scripts": "^5.0.1",
     "socket.io-client": "^4.7.4",
     "storybook": "^7.6.14",
     "ts-loader": "^9.5.1",
