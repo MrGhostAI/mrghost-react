@@ -1,14 +1,20 @@
 {
   "package-name": "mrghost",
   "name": "mrghost",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "authors": [
     "Evan Phibbs"
   ],
   "keywords": [
     "ai",
+    "agent",
+    "assistant",
+    "generative ui",
     "chatbot",
-    "generative ui"
+    "mister ghost",
+    "mr. ghost",
+    "ai ghost",
+    "ghost ai"
   ],
   "description": "A library for creating and managing Mr. Ghost AI applications and browser actions",
   "repository": {
