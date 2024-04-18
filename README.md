@@ -1,4 +1,4 @@
-# Mr. Ghost Chat Interface
+# Mr. Ghost
 
 This package enables the use of a Mr. Ghost AI assistant as well as the execution of browser side actions.
 
