@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {Socket, io} from 'socket.io-client';
 
-const SOCKET_URL = process.env.NODE_ENV === 'development' ? 'https://monkey-bright-closely.ngrok-free.app/chat' : 'https://app.mrghost.ai/chat';
+// const SOCKET_URL = process.env.NODE_ENV === 'development' ? 'https://monkey-bright-closely.ngrok-free.app/chat' : 'https://app.mrghost.ai/chat';
 
 /**
  * Custom hook to handle chat socket connection.
@@ -12,7 +12,8 @@ const SOCKET_URL = process.env.NODE_ENV === 'development' ? 'https://monkey-brig
  * @param functions - Additional functions to emit events.
  */
 
-const useChatSocket = ({isAdmin, preview, postLocalStorage, dispatch, functions=null} : {
+const useChatSocket = ({ domain = "https://app.mrghost.ai", isAdmin, preview, postLocalStorage, dispatch, functions=null} : {
+  domain?: string,
   isAdmin: boolean,
   preview: boolean,
   postLocalStorage: boolean | null,
@@ -24,25 +25,25 @@ const useChatSocket = ({isAdmin, preview, postLocalStorage, dispatch, functions=
 
   useEffect(() => {
     // If in preview mode or if the socket should not be initialized, return early.
-    console.log(`running useEffect ${isAdmin} ${preview}`);
+    console.log(`running useEffect ${isAdmin} ${preview} ${domain} ${postLocalStorage}`);
     if (preview) return;
 
     // Initialize socket connection.
     let socket : any;
     if (postLocalStorage) {
       console.log('iframe chat');
-      socket = io(SOCKET_URL, {
+      socket = io(`${domain}/chat`, {
         transports: ['websocket'],
       });
     } else {
       if (isAdmin) {
         console.log('admin chat');
-        socket = io(SOCKET_URL, {
+        socket = io(`${domain}/chat`, {
           withCredentials: true
         });
       } else {
         console.log('user chat');
-        socket = io(SOCKET_URL);
+        socket = io(`${domain}/chat`);
       }
     }
     setChatSocket(socket);

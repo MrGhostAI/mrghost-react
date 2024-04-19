@@ -1,6 +1,6 @@
 import React from "react";
 
-const DOMAIN = process.env.NODE_ENV === 'development' ? 'https://monkey-bright-closely.ngrok-free.app' : 'https://app.mrghost.ai';
+// const DOMAIN = process.env.NODE_ENV === 'development' ? 'https://monkey-bright-closely.ngrok-free.app' : 'https://app.mrghost.ai';
 
 interface Bot {
   // Assuming the structure of your Bot data, add actual properties used
@@ -27,8 +27,8 @@ const botContextDefault: BotContextType = {
 
 export const BotContext : React.Context<BotContextType> = React.createContext<BotContextType>(botContextDefault);
 
-const getBot = (botId: string, setBot: (bot: Bot | null) => void) => {
-  fetch(`${DOMAIN}/api/bots/${botId}`, {
+const getBot = (domain: string, botId: string, setBot: (bot: Bot | null) => void) => {
+  fetch(`${domain}/api/bots/${botId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -49,8 +49,8 @@ const getBot = (botId: string, setBot: (bot: Bot | null) => void) => {
   });
 };
 
-const getMyBotUser = (botId: string, setMyBotUser: (user: BotUser | null) => void) => {
-  fetch(`${DOMAIN}/api/bots/${botId}/users/me`, {
+const getMyBotUser = (domain: string, botId: string, setMyBotUser: (user: BotUser | null) => void) => {
+  fetch(`${domain}/api/bots/${botId}/users/me`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const getMyBotUser = (botId: string, setMyBotUser: (user: BotUser | null) => voi
   });
 };
 
-export const BotProvider = ({ botId, children } : { botId: string; children: React.ReactNode }) => {
+export const BotProvider = ({ domain="https://app.mrghost.ai", botId, children } : { domain: string, botId: string; children: React.ReactNode }) => {
   const [bot, setBot] = React.useState<Bot | null>(null);
   const [myBotUser, setMyBotUser] = React.useState<BotUser | null>(null);
 
@@ -79,8 +79,8 @@ export const BotProvider = ({ botId, children } : { botId: string; children: Rea
 
   React.useEffect(() => {
     console.log('BotProvider use effect botId', botId);
-    getBot(botId, setBot);
-    getMyBotUser(botId, setMyBotUser);
+    getBot(domain, botId, setBot);
+    getMyBotUser(domain, botId, setMyBotUser);
   }, [botId]);
 
   React.useEffect(() => {

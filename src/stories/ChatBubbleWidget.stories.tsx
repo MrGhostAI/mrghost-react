@@ -1,8 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-
-import { ChatApp } from "../components";
 import { ActionContext, ActionProvider } from "../contexts/index";
+import { BubbleChat } from "../components/Chat";
 
 function ChatActionStory({
   botId,
@@ -26,6 +25,7 @@ function WidgetStory({
   chatUserId: string;
 }) {
   const { registerFunction } = React.useContext(ActionContext);
+  const [color, setColor] = React.useState("white" as string);
   React.useEffect(() => {
     console.log("registering function...");
     registerFunction({
@@ -46,10 +46,42 @@ function WidgetStory({
     });
   }, []);
 
+  React.useEffect(() => {
+    console.log("registering function...");
+    registerFunction({
+      name: "change-background-color",
+      fn: ({color}: {color: string}) => {
+        console.log(`Changing background color to ${color}`);
+        setColor(color);
+        return "success"
+      },
+      parameters: {
+        type: "object",
+        properties: {
+          color: {
+            type: "string",
+            description: "Any CSS color value (e.g. 'red', '#ff0000', 'rgb(255, 0, 0)').",
+          },
+        },
+      },
+      description: "A function that changes the background color of the website.",
+    });
+  }, []);
+
   return (
-    <div style={{ height: "95vh", overflow: "hidden" }}>
-      <ChatApp botId={botId} userId={chatUserId} domain={'https://monkey-bright-closely.ngrok-free.app'} />
-    </div>
+    <>
+      <div style={{ 
+        height: "100svh",
+        width: "100svw", 
+        backgroundColor: color, 
+        position: "absolute",
+        zIndex: -1, 
+        transition: "background-color 2s ease-in-out"
+      }} />
+      <div style={{ height: "95vh", overflow: "hidden" }}>
+        <BubbleChat botId={botId} userId={chatUserId} domain={'https://monkey-bright-closely.ngrok-free.app'} />
+      </div>
+    </>
   );
 }
 

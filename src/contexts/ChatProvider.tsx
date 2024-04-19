@@ -18,6 +18,8 @@ interface ChatContextType {
   refreshChatLocalStorage: (botId: string) => void;
   chatId: string | null;
   additionalFunctions: any;
+  hasUnreadMessages: boolean;
+  setHasUnreadMessages: (hasUnreadMessages: boolean) => void;
 }
 
 export const ChatContext = createContext<ChatContextType>({
@@ -30,9 +32,12 @@ export const ChatContext = createContext<ChatContextType>({
   refreshChatLocalStorage: () => {},
   chatId: null,
   additionalFunctions: null,
+  hasUnreadMessages: false,
+  setHasUnreadMessages: () => {},
 });
 
 export const ChatProvider = ({
+  domain = 'https://app.mrghost.ai',
   botId,
   isAdmin = false,
   chatId: startChatId = null,
@@ -42,6 +47,7 @@ export const ChatProvider = ({
   additionalFunctions = null,
   children,
 } : {
+  domain?: string,
   botId: string,
   isAdmin?: boolean,
   chatId?: string | null,
@@ -65,6 +71,8 @@ export const ChatProvider = ({
     isTypingUser: null,
   });
 
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
+
   // Custom hook to manage socket connection and events
   const {
     chatSocket,
@@ -73,6 +81,7 @@ export const ChatProvider = ({
     emitMessage,
     emitTyping,
   } = useChatSocket({
+    domain,
     isAdmin,
     preview,
     postLocalStorage,
@@ -166,12 +175,14 @@ export const ChatProvider = ({
     <ChatContext.Provider
       value={{
         ...chatState,
+        hasUnreadMessages,
+        setHasUnreadMessages,
         sendMessage,
         userIsTyping,
         isAdmin,
         refreshChatLocalStorage,
         chatId,
-        additionalFunctions,
+        additionalFunctions
       }}
     >
       {children}

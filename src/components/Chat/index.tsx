@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useContext, useEffect, useRef } from 'react';
 import {
   TextField,
   Button,
@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import PulsatingDot from './PulsatingDot';
 import styled from 'styled-components';
-
+import DefaultChatIcon from './Elements/DefaultChatIcon';
 import ExitIcon from './ExitIcon';
 import { ReactComponent as SendIcon } from './Send.svg';
 import './Chat.css'
@@ -44,6 +44,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: '0.25rem 0',
     // textAlign: 'center',
     color: '#22252A',
     borderTop: '1px hsla(90, 6%, 87%, 1) solid',
@@ -56,9 +57,10 @@ const styles = {
     padding: '10px 20px',
     margin: '0',
     borderRadius: '20px',
-    maxWidth: '90%',
+    maxWidth: '80%',
     width: 'fit-content',
     wordWrap: 'break-word',
+    // marginBottom: '1rem',
   },
   right: {
     backgroundColor: '#333',
@@ -112,7 +114,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     borderTop: '1px hsla(90, 6%, 87%, 1) solid',
-    padding: '0.75rem 0.5rem',
+    padding: '0.5rem 0.5rem',
   },
   inputText: {
     marginRight: 1,
@@ -133,7 +135,7 @@ const styles = {
     cursor: 'pointer',
     minHeight: '40px',
     minWidth: '40px',
-    padding: 0,
+    margin: '0 0.5rem 0 0',
     backgroundColor: 'transparent',
     '&:hover': {
       backgroundColor: 'transparent',
@@ -169,13 +171,14 @@ export function GhostIcon({color1, color2, color3, width='100%'} : {color1: stri
 const ChatIconButton = React.memo(function ChatIconButton({
   isOpen,
   handleOnClick,
-  hasUnreadMessages,
   defaultStyles = {},
-} : {isOpen: boolean, handleOnClick: () => void, hasUnreadMessages: boolean, defaultStyles: any}){
+} : {isOpen: boolean, handleOnClick: () => void, defaultStyles: any}){
   const { bot } = useContext(BotContext);
-  const { newMessages } = useContext(ChatContext);
-  const [imageError, setImageError] = useState(false);
+  const {messages, hasUnreadMessages} = useContext(ChatContext);
 
+  if (!bot) return null;
+
+  console.log('ChatIconButton', bot);
   const styles = { ...defaultStyles, ...(bot?.styles || {}) };
 
   return (
@@ -193,25 +196,12 @@ const ChatIconButton = React.memo(function ChatIconButton({
       }}
       disableRipple
     >
-      {/* <ExpandMoreIcon
-        sx={{
-          position: 'absolute',
-          bottom: '50%',
-          right: '50%',
-          transform: 'translate(50%, 50%)',
-          opacity: isOpen ? 1 : 0,
-          transition: 'opacity 0.3s ease',
-          zIndex: 2,
-          color: '#333',
-        }}
-        fontSize="large"
-      /> */}
       <Badge
         overlap="circular"
         badgeContent={<PulsatingDot color={theme.palette.error.main} />}
-        invisible={!newMessages}
+        invisible={!hasUnreadMessages}
         sx={{
-          filter: isOpen ? 'brightness(120%) contrast(70%)' : 'none' ,
+          // filter: isOpen ? 'brightness(120%) contrast(70%)' : 'none' ,
           transition: 'filter 0.3s ease',
         }}
       >
@@ -280,9 +270,10 @@ export function MainMessageComponent({
       sx={{
         width: '100%',
         textAlign: isRight ? 'right' : 'left',
+        marginBottom: '1rem',
       }}
     >
-      <Typography
+      {/* <Typography
         variant="caption"
         sx={{
           opacity: '.5',
@@ -292,7 +283,7 @@ export function MainMessageComponent({
         }}
       >
         {senderName}
-      </Typography>
+      </Typography> */}
       <Box
         sx={{
           ...styles.messageBubble,
@@ -446,7 +437,7 @@ const StyledLink = styled.a`
   color: #333; // Adjust according to your theme
 
   &:hover {
-    color: #444; // Adjust according to your theme
+    color: #666; // Adjust according to your theme
     cursor: pointer;
   }
 `;
@@ -497,6 +488,7 @@ export function InputBar({ sendMessage, chatStyles, preview } : {sendMessage: (t
         name="message"
         fullWidth
         autoComplete="off"
+        inputRef={input => input && input.focus()}
         sx={{
           ...styles.inputText,
           fontFamily: `${chatStyles?.fontType || ''} !important`,
@@ -520,16 +512,9 @@ export function InputBar({ sendMessage, chatStyles, preview } : {sendMessage: (t
         sx={styles.sendButton}
         disabled={preview}
       >
-        <svg width="25" height="26" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <g clip-path="url(#clip0_174_2959)">
-          <path d="M1.20893 6.04069C0.929857 6.12043 0.676444 6.27166 0.473762 6.4794C0.27108 6.68715 0.126155 6.94422 0.0533278 7.22517C-0.0194996 7.50612 -0.0177053 7.80123 0.0585331 8.08127C0.134772 8.36132 0.282812 8.61661 0.488005 8.82187L3.33169 11.6622V17.1512H8.82655L11.6894 20.0099C11.8431 20.1649 12.0258 20.288 12.2272 20.3721C12.4286 20.4562 12.6446 20.4997 12.8629 20.5C13.0063 20.4997 13.1492 20.4812 13.2879 20.445C13.5688 20.3743 13.826 20.2308 14.0338 20.029C14.2415 19.8273 14.3925 19.5743 14.4714 19.2957L20.0004 0.5L1.20893 6.04069ZM1.67232 7.64339L15.8641 3.45954L5.00024 14.3059V10.9721L1.67232 7.64339ZM12.8737 18.8315L9.51747 15.4844H6.18372L17.0459 4.63135L12.8737 18.8315Z" fill="#22252A"/>
-          </g>
-          <defs>
-          <clipPath id="clip0_174_2959">
-            <rect width="25" height="26" fill="white" transform="translate(0 0.5)"/>
-          </clipPath>
-          </defs>
-        </svg>
+        <svg width="25px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.3009 13.6949L20.102 3.89742M10.5795 14.1355L12.8019 18.5804C13.339 19.6545 13.6075 20.1916 13.9458 20.3356C14.2394 20.4606 14.575 20.4379 14.8492 20.2747C15.1651 20.0866 15.3591 19.5183 15.7472 18.3818L19.9463 6.08434C20.2845 5.09409 20.4535 4.59896 20.3378 4.27142C20.2371 3.98648 20.013 3.76234 19.7281 3.66167C19.4005 3.54595 18.9054 3.71502 17.9151 4.05315L5.61763 8.2523C4.48114 8.64037 3.91289 8.83441 3.72478 9.15032C3.56153 9.42447 3.53891 9.76007 3.66389 10.0536C3.80791 10.3919 4.34498 10.6605 5.41912 11.1975L9.86397 13.42C10.041 13.5085 10.1295 13.5527 10.2061 13.6118C10.2742 13.6643 10.3352 13.7253 10.3876 13.7933C10.4468 13.87 10.491 13.9585 10.5795 14.1355Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
       </Button>
     </Box>
   );
@@ -543,7 +528,7 @@ export function ChatClient({
   preview = false,
   messageComponent: MessageComponent = Message,
   blank = false,
-}) {
+} : {disableHeader: boolean, disableFooter: boolean, exitHandler: Function | null, chatStyles: any, preview: boolean, messageComponent: any, blank: boolean}) {
   const { bot } = useContext(BotContext);
   // const context = useContext(ChatContext);
   // console.log('ChatClient context', context);
@@ -567,12 +552,13 @@ export function ChatClient({
   const messagesEndRef = useRef(null);
   const parentRef = useRef(null);
   const [hasInitialScroll, setHasInitialScroll] = useState(false);
-
+  const [messagesCount, setMessagesCount] = useState(0);
   const myRoles = isAdmin ? ['admin', 'ai'] : ['user'];
 
   chatStyles = {
     ...theme.components.DefaultChatStyles,
     ...chatStyles,
+    ...(bot?.styles || {}),
   };
 
   console.log('loading chat');
@@ -614,23 +600,14 @@ export function ChatClient({
     ]
   );
 
-  // useEffect(() => {
-  //   const chatContainer = document.querySelector('.chat-container'); // Adjust the selector to your chat container
-  //   if (!chatContainer) return;
-
-  //   const observer = new MutationObserver(() => {
-  //     chatContainer.scrollTop = chatContainer.scrollHeight;
-  //   });
-
-  //   observer.observe(chatContainer, { childList: true });
-
-  //   return () => observer.disconnect();
-  // }, []);
+  useEffect(() => {
+    console.log('messages changed', messages.length);
+    setMessagesCount(messages.length)
+  }, [messages]);
 
   const scrollToBottom = () => {
-    console.log('messages changed');
     if (!messages || preview || blank || messages.length === 0) return;
-    const behavior = 'instant' // hasInitialScroll ? 'smooth' : 'instant';
+    const behavior = hasInitialScroll ? 'smooth' : 'instant';
     console.log('scrolling...', behavior);
     setTimeout(() => {
       const messagesEnd = messagesEndRef.current;
@@ -639,17 +616,28 @@ export function ChatClient({
       if (messagesEnd && parent) {
         const topPosition = messagesEnd.offsetTop;
         if (behavior === 'smooth') {
+          console.log('scrolling to bottom smooth');
           parent.scrollTo({ top: topPosition, behavior: 'smooth' });
         } else {
+          console.log('scrolling to bottom instant');
           parent.scrollTop = topPosition;
         }
       }
     }, 0); // This timeout ensures the code executes after the DOM has fully loaded
     if (!hasInitialScroll) {
+      console.log('setting initial scroll');
       setHasInitialScroll(true);
     }
   };
-  useEffect(scrollToBottom, [messages, preview, blank]);
+  useLayoutEffect(scrollToBottom, [messagesCount, preview, blank]);
+
+  const [hasShadow, setHasShadow] = useState(false);
+
+  // Function to handle scroll events
+  const handleScroll = (e) => {
+    const scrollTop = e.target.scrollTop; // Get how far it's been scrolled
+    setHasShadow(scrollTop > 0); // Set shadow state based on scroll position
+  };
 
   useEffect(() => {
     console.log('chat id changed');
@@ -663,48 +651,61 @@ export function ChatClient({
   return (
     <Box sx={styles.chat}>
       {disableHeader ? null : (
-        <Header
-          exitHandler={exitHandler}
-          chatStyles={chatStyles}
-          refreshChatLocalStorage={refreshChatLocalStorage}
-        />
+        <Box sx={{ boxShadow: hasShadow ? '0 2px 10px rgba(0,0,0,0.1)' : 'none',
+        transition: 'box-shadow 0.3s ease-in-out' }}>
+          <Header
+            exitHandler={exitHandler}
+            chatStyles={chatStyles}
+            refreshChatLocalStorage={refreshChatLocalStorage}
+          />
+        </Box>
       )}
-      <Box
-        sx={{
-          flexGrow: 1,
-          overflowY: 'hidden',
-          backgroundColor: chatStyles?.backgroundColor || 'none',
-          position: 'relative',
-        }}
-      >
+      <Box sx={{
+        flexGrow: 1,
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
             height: '100%',
+            backgroundColor: chatStyles?.backgroundColor || 'none',
             overflowY: 'auto',
-            padding: '10px 10px 0px',
           }}
           ref={parentRef}
+          onScroll={handleScroll}
         >
-          <MessageList messages={messages} myRoles={myRoles} chatStyles={chatStyles} preview={preview} MessageComponent={MessageComponent} blank={blank} previewMessages={previewMessages} />
-          <div ref={messagesEndRef} />
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '1rem 1rem 1rem',
+            }}
+          >
+            <MessageList messages={messages} myRoles={myRoles} chatStyles={chatStyles} preview={preview} MessageComponent={MessageComponent} blank={blank} previewMessages={previewMessages} />
+            <div ref={messagesEndRef} />
+          </Box>
+          <Typography
+            variant="caption"
+            color="#000"
+            sx={{
+              visibility: isTypingUser ? 'visible' : 'hidden',
+              opacity: isTypingUser ? 1 : 0,
+              transition: 'visibility 0.3s ease, opacity 0.3s ease',
+              position: 'absolute',
+              bottom: '0.75rem',
+              left: '1.5rem',
+              padding: '0.25rem 0.5rem',
+              boxShadow: '0 0 0.5rem 0 rgba(0,0,0,0.2)',
+              backgroundColor: `rgba(255, 255, 255, 0.6)`,
+              borderRadius: '0.5rem',
+              backdropFilter: 'blur(4px)',
+              zIndex: 1000
+            }}
+            component="div"
+          >
+            {isTypingUser} is typing...
+          </Typography>
         </Box>
-        <Typography
-          variant="caption"
-          color="#000"
-          sx={{
-            opacity: '.5',
-            // margin: '0.25rem',
-            visibility: isTypingUser ? 'visible' : 'hidden',
-            position: 'absolute',
-            bottom: '0.5rem',
-            left: '1rem',
-            backgroundColor: 'transparent',
-          }}
-        >
-          {isTypingUser} is typing...
-        </Typography>
       </Box>
       <InputBar
         sendMessage={sendMessage}
@@ -721,13 +722,14 @@ export function ChatApp({
   chatId = null,
   userId = null,
   visible = true,
-} : {botId: string, chatId?: string | null, userId?: string | null, visible?: boolean}) {
-  const { bot } = useContext(BotContext);
+  domain = 'https://mrghost.ai',
+} : {botId: string, chatId?: string | null, userId?: string | null, visible?: boolean, domain?: string}) {
   const { functions } = useContext(ActionContext);
   return (
     <div style={{ display: visible ? 'block' : 'none', height: '100%', width: '100%' }}>
-      <BotProvider botId={botId}>
+      <BotProvider botId={botId} domain={domain}>
         <ChatProvider
+          domain={domain}
           botId={botId}
           chatId={chatId}
           botUserId={userId}
@@ -735,7 +737,7 @@ export function ChatApp({
           additionalFunctions={functions}
         >
           <ChatClient
-            chatStyles={bot?.styles || {}}
+            chatStyles={{}}
             exitHandler={null}
             preview={false}
             messageComponent={Message}
@@ -744,6 +746,101 @@ export function ChatApp({
         </ChatProvider>
       </BotProvider>
     </div>
+  );
+}
+
+function ChatReadMonitor({isChatOpen} : {isChatOpen: boolean}) {
+  const { messages, setHasUnreadMessages } = useContext(ChatContext);
+  const [lastNumMessages, setLastNumMessages] = useState(0);
+  useEffect(() => {
+    console.log('ChatReadMonitor', messages.length, isChatOpen);
+    if (isChatOpen) {
+      console.log(`chat is open, setting unread messages to false`);
+      setHasUnreadMessages(false);
+    } else {
+      if (messages.length > lastNumMessages) {
+        console.log(`chat is closed, setting unread messages to true`);
+        setHasUnreadMessages(true);
+      }
+    }
+    setLastNumMessages(messages.length);
+  }, [messages.length, isChatOpen]);
+  return null;
+}
+
+export function BubbleChat({
+  botId,
+  chatId = null,
+  userId = null,
+  icon = DefaultChatIcon,
+  domain = 'https://mrghost.ai',
+} : {botId: string, chatId?: string | null, userId?: string | null, visible?: boolean, icon?: any | null, domain?: string}) {
+  const { bot } = useContext(BotContext);
+  const { functions } = useContext(ActionContext);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatVisible, setIsChatVisible] = useState(isChatOpen);
+
+  useEffect(() => {
+    if (isChatOpen) {
+      setIsChatVisible(true);
+    } else {
+      const timer = setTimeout(() => {
+        setIsChatVisible(false);
+      }, 100); // Delay matches the transition duration
+
+      return () => clearTimeout(timer);
+    }
+  }, [isChatOpen]);
+
+  const handleOnClick = () => {
+    console.debug('clicked', isChatOpen);
+    setIsChatOpen(!isChatOpen);
+  };
+
+  return (
+    <BotProvider botId={botId} domain={domain}>
+      <ChatProvider
+        botId={botId}
+        chatId={chatId}
+        botUserId={userId}
+        preview={false}
+        additionalFunctions={functions}
+        domain={domain}
+      >
+        <ChatIconButton
+          isOpen={isChatOpen}
+          handleOnClick={handleOnClick}
+          defaultStyles={{}}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: '6rem',
+            right: '1rem',
+            width: 'calc(100% - 2rem)',
+            maxWidth: '30rem',
+            height: 'calc(100% - 7rem)',
+            borderRadius: '1rem',
+            overflow: 'hidden',
+            boxShadow: '0 0 0.75rem 0 rgba(0,0,0,0.2)',
+            transform: isChatOpen ? 'scale(1)' : 'scale(0.9)',
+            opacity: isChatOpen ? 1 : 0,
+            visibility: isChatVisible ? 'visible' : 'hidden',
+            transition: 'transform 0.1s ease-in-out, opacity 0.1s ease-in-out',
+            transformOrigin: 'right bottom'
+          }}
+        >
+          <ChatReadMonitor isChatOpen={isChatOpen} />
+          <ChatClient
+            chatStyles={bot?.styles || {}}
+            exitHandler={handleOnClick}
+            preview={false}
+            messageComponent={Message}
+            blank={false}
+          />
+        </Box>
+      </ChatProvider>
+    </BotProvider>
   );
 }
 
