@@ -12,7 +12,6 @@ import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import PulsatingDot from './PulsatingDot';
 import styled from 'styled-components';
-import DefaultChatIcon from './Elements/DefaultChatIcon';
 import ExitIcon from './ExitIcon';
 import './Chat.css'
 
