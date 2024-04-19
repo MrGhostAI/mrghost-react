@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ActionContext, ActionProvider, useRegisterFunction } from "../index";
+import { ActionProvider, useRegisterFunction } from "../index";
 import { BubbleChat } from "../components/Chat";
 
 function ChatActionStory({
