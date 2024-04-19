@@ -1,7 +1,7 @@
 import React from 'react';
 import './PulsatingDot.css';
 
-export default ({ color = '#eee' }) => (
+export default ({ color = '#eee' } : { color?: string }) => (
   <div
     className="pulsatingDot"
     style={{

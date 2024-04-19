@@ -14,16 +14,15 @@ import PulsatingDot from './PulsatingDot';
 import styled from 'styled-components';
 import DefaultChatIcon from './Elements/DefaultChatIcon';
 import ExitIcon from './ExitIcon';
-import { ReactComponent as SendIcon } from './Send.svg';
 import './Chat.css'
 
 // import PromoteMessage from './PromoteMessage.js';
 import { BotProvider, BotContext } from '../../contexts/BotContext';
-import {theme} from '../../theme';
+import {theme, defaultChatStyles} from '../../theme';
 import { ChatContext, ChatProvider } from '../../contexts/ChatProvider';
 import ChatIcon from './Elements/ChatIcon';
 import { getHumanReadableDate } from '../../Utils/Date';
-import { areEqual, convertToHTML, getSenderName } from './Utils/ChatUtils';
+import { areEqual, convertToHTML } from './Utils/ChatUtils';
 import {ActionContext} from '../../contexts/ActionContext';
 
 const styles = {
@@ -169,12 +168,12 @@ export function GhostIcon({color1, color2, color3, width='100%'} : {color1: stri
 }
 
 const ChatIconButton = React.memo(function ChatIconButton({
-  isOpen,
+  icon,
   handleOnClick,
   defaultStyles = {},
-} : {isOpen: boolean, handleOnClick: () => void, defaultStyles: any}){
+} : {icon: any, handleOnClick: () => void, defaultStyles: any}){
   const { bot } = useContext(BotContext);
-  const {messages, hasUnreadMessages} = useContext(ChatContext);
+  const {hasUnreadMessages} = useContext(ChatContext);
 
   if (!bot) return null;
 
@@ -205,7 +204,9 @@ const ChatIconButton = React.memo(function ChatIconButton({
           transition: 'filter 0.3s ease',
         }}
       >
-        <ChatIcon bot={bot} styles={styles} />
+        {
+          icon ? icon : <ChatIcon styles={styles} />
+        }
       </Badge>
     </IconButton>
   );
@@ -222,7 +223,6 @@ export function MainMessageComponent({
   console.log('MainMessageComponent bot', bot);
   const isRight = myRoles.includes(message.role || '');
   const senderStyles = isRight ? styles.right : styles.left;
-  let senderName = getSenderName(message, bot);
   const leftCorner = { borderRadius: '24px 24px 24px 0px' };
   const rightCorner = { borderRadius: '24px 24px 0px 24px' };
   const bubbleStyle = isRight ? rightCorner : leftCorner;
@@ -320,7 +320,7 @@ export function MainMessageComponent({
   );
 }
 
-export const Message = React.memo(MainMessageComponent, areEqual);
+export const DefaultMessage = React.memo(MainMessageComponent, areEqual);
 
 export function MessageList({
   messages,
@@ -337,56 +337,73 @@ export function MessageList({
   }, []);
   if (blank) return null;
   if (preview) {
-    return previewMessages?.map((message) => (
-      <React.Fragment key={message._id}>
-        <MessageComponent
-          message={message}
-          myRoles={myRoles}
-          chatStyles={chatStyles}
-        />
-      </React.Fragment>
-    ));
-  }
-  return messages?.map((message, index) => {
-    // created at is a dateString
-    const timeGap =
-      index === 0
-        ? (new Date().getTime() - new Date(message.createdAt).getTime()) / 1000
-        : (new Date(message.createdAt) -
-            new Date(messages[index - 1].createdAt)) /
-          1000;
     return (
-      <React.Fragment key={index !== 0 ? message._id : 0}>
-        {timeGap > 900 ||
-          (timeGap === -1 && message.createdAt && (
-            <Box sx={{ margin: '0.5rem 0', textAlign: 'center' }}>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: '#333',
-                }}
-              >
-                {getHumanReadableDate(message.createdAt)}
-              </Typography>
-            </Box>
-          ))}
-        <MessageComponent
-          message={message}
-          myRoles={myRoles}
-          chatStyles={chatStyles}
-        />
-      </React.Fragment>
+      <>
+      {
+        previewMessages?.map((message) => (
+          <React.Fragment key={message._id}>
+            <MessageComponent
+              message={message}
+              myRoles={myRoles}
+              chatStyles={chatStyles}
+            />
+          </React.Fragment>
+        ))
+      }
+      </>
     );
-  });
+  }
+  return (
+    <>
+      {messages?.map((message, index) => {
+        // Calculate the time gap in seconds
+        const currentTime = new Date().getTime();
+        const messageTime = new Date(message.createdAt).getTime();
+        const previousMessageTime = index > 0 ? new Date(messages[index - 1].createdAt).getTime() : null;
+  
+        const timeGap = !previousMessageTime
+          ? (currentTime - messageTime) / 1000
+          : (messageTime - previousMessageTime) / 1000;
+  
+        return (
+          <React.Fragment key={message._id}>
+            {(timeGap > 900 || index === 0) && message.createdAt && (
+              <Box sx={{ margin: '0.5rem 0', textAlign: 'center' }}>
+                <Typography variant="caption" sx={{ color: '#333' }}>
+                  {getHumanReadableDate(message.createdAt)}
+                </Typography>
+              </Box>
+            )}
+            <MessageComponent
+              message={message}
+              myRoles={myRoles}
+              chatStyles={chatStyles}
+            />
+          </React.Fragment>
+        );
+      })}
+    </>
+  );
+  
 };
 
 export function Header({
   exitHandler,
   chatStyles,
   refreshChatLocalStorage,
-} : {exitHandler: () => void, chatStyles: any, refreshChatLocalStorage: () => void}) {
+} : {exitHandler: Function | null, chatStyles: any, refreshChatLocalStorage: Function}) {
   let svgUrl = '';
   const { bot } = useContext(BotContext);
+
+  const onClick = () => {
+    refreshChatLocalStorage();
+  }
+
+  const onExit = () => {
+    if (exitHandler) {
+      exitHandler();
+    }
+  }
 
   return (
     <Box
@@ -405,7 +422,7 @@ export function Header({
         </div>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <IconButton
-            onClick={refreshChatLocalStorage}
+            onClick={onClick}
             sx={{
               color: chatStyles?.fontColor || '#fff',
               marginRight: '-0.5rem',
@@ -417,7 +434,7 @@ export function Header({
           </IconButton>
           {exitHandler ? (
             <IconButton
-              onClick={exitHandler}
+              onClick={onExit}
               sx={{
                 marginRight: '-0.5rem',
               }}
@@ -526,9 +543,9 @@ export function ChatClient({
   exitHandler = null,
   chatStyles = {},
   preview = false,
-  messageComponent: MessageComponent = Message,
+  messageComponent: MessageComponent = DefaultMessage,
   blank = false,
-} : {disableHeader: boolean, disableFooter: boolean, exitHandler: Function | null, chatStyles: any, preview: boolean, messageComponent: any, blank: boolean}) {
+} : {disableHeader?: boolean, disableFooter?: boolean, exitHandler?: Function | null, chatStyles?: any, preview?: boolean, messageComponent?: any, blank?: boolean}) {
   const { bot } = useContext(BotContext);
   // const context = useContext(ChatContext);
   // console.log('ChatClient context', context);
@@ -556,7 +573,7 @@ export function ChatClient({
   const myRoles = isAdmin ? ['admin', 'ai'] : ['user'];
 
   chatStyles = {
-    ...theme.components.DefaultChatStyles,
+    ...(defaultChatStyles || {}),
     ...chatStyles,
     ...(bot?.styles || {}),
   };
@@ -585,21 +602,6 @@ export function ChatClient({
     },
   ];
 
-  useEffect(
-    (a) => {
-      console.log(
-        `ChatClient changed: chatId ${chatId}, messages ${messages?.length}, isTyping ${isTypingUser}, isAdmin: ${isAdmin}, blank: ${blank}`
-      );
-    },
-    [
-      messages.length,
-      isTypingUser,
-      isAdmin,
-      chatId,
-      blank,
-    ]
-  );
-
   useEffect(() => {
     console.log('messages changed', messages.length);
     setMessagesCount(messages.length)
@@ -610,8 +612,9 @@ export function ChatClient({
     const behavior = hasInitialScroll ? 'smooth' : 'instant';
     console.log('scrolling...', behavior);
     setTimeout(() => {
-      const messagesEnd = messagesEndRef.current;
-      const parent = parentRef.current;
+      const messagesEnd: any = messagesEndRef.current;
+      const parent: any
+       = parentRef.current;
 
       if (messagesEnd && parent) {
         const topPosition = messagesEnd.offsetTop;
@@ -634,7 +637,7 @@ export function ChatClient({
   const [hasShadow, setHasShadow] = useState(false);
 
   // Function to handle scroll events
-  const handleScroll = (e) => {
+  const handleScroll = (e: any) => {
     const scrollTop = e.target.scrollTop; // Get how far it's been scrolled
     setHasShadow(scrollTop > 0); // Set shadow state based on scroll position
   };
@@ -740,7 +743,7 @@ export function ChatApp({
             chatStyles={{}}
             exitHandler={null}
             preview={false}
-            messageComponent={Message}
+            messageComponent={DefaultMessage}
             blank={false}
           />
         </ChatProvider>
@@ -772,7 +775,7 @@ export function BubbleChat({
   botId,
   chatId = null,
   userId = null,
-  icon = DefaultChatIcon,
+  icon = null,
   domain = 'https://mrghost.ai',
 } : {botId: string, chatId?: string | null, userId?: string | null, visible?: boolean, icon?: any | null, domain?: string}) {
   const { bot } = useContext(BotContext);
@@ -790,6 +793,7 @@ export function BubbleChat({
 
       return () => clearTimeout(timer);
     }
+    return () => {};
   }, [isChatOpen]);
 
   const handleOnClick = () => {
@@ -808,7 +812,7 @@ export function BubbleChat({
         domain={domain}
       >
         <ChatIconButton
-          isOpen={isChatOpen}
+          icon={icon}
           handleOnClick={handleOnClick}
           defaultStyles={{}}
         />
@@ -835,7 +839,7 @@ export function BubbleChat({
             chatStyles={bot?.styles || {}}
             exitHandler={handleOnClick}
             preview={false}
-            messageComponent={Message}
+            messageComponent={DefaultMessage}
             blank={false}
           />
         </Box>
@@ -843,97 +847,3 @@ export function BubbleChat({
     </BotProvider>
   );
 }
-
-function EmbedChat({shadow=false}) {
-  // const {bot} = useContext(BotContext);
-  // const {chat} = useContext(ChatContext);
-  const { bot } = useContext(BotContext);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isPromoteOpen, setIsPromoteOpen] = useState(true);
-
-  function requestResize(width : string, height : string) {
-    window.parent.postMessage(
-      {
-        type: 'resizeIframe',
-        width: width,
-        height: height,
-      },
-      '*'
-    );
-  }
-
-  const handleOnClick = () => {
-    console.log('clicked', isChatOpen);
-    if (!isChatOpen) {
-      requestResize('50rem', '95%');
-    } else {
-      requestResize('88px', '88px');
-    }
-    setIsChatOpen(!isChatOpen);
-  };
-
-  function handleOnClose() {
-    console.log('closed');
-    requestResize('88px', '88px');
-    setIsChatOpen(false);
-    setIsPromoteOpen(false);
-  }
-
-  return (
-    <Box
-      sx={{
-        position: 'relative',
-        height: '100svh',
-        width: '100%',
-        backgroundColor: 'transparent',
-      }}
-    >
-      <ChatIconButton
-        isOpen={isChatOpen}
-        handleOnClick={handleOnClick}
-        hasUnreadMessages={true}
-        defaultStyles={theme.components.DefaultChatStyles}
-      />
-      {isChatOpen && (
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: '6rem',
-            right: '1rem',
-            width: 'calc(100% - 2rem)',
-            height: 'calc(100% - 7rem)',
-            // border: '1px #DDD solid',
-            borderRadius: '1rem',
-            overflow: 'hidden',
-            boxShadow: shadow ? '0 0 0.75rem 0 rgba(0,0,0,0.2)' : 'none',
-          }}
-        >
-          <BotProvider botId={bot._id}>
-            <ChatProvider botId={bot._id} preview={false}>
-              <ChatApp
-                exitHandler={handleOnClick}
-                preview={false}
-                disableFooter={true}
-                chatStyles={{
-                  chat: {
-                    borderRadius: '1rem',
-                    border: 'none',
-                  },
-                }}
-              />
-            </ChatProvider>
-          </BotProvider>
-        </Box>
-      )}
-      {/* {bot?.styles?.showPromoteMessage && (
-        <Box sx={{ position: 'absolute', bottom: '1rem', right: '1rem' }}>
-          <PromoteMessage
-            open={isPromoteOpen}
-            setOpen={handleOnClose}
-            setIsChatOpen={handleOnClick}
-          />
-        </Box>
-      )} */}
-    </Box>
-  );
-};
