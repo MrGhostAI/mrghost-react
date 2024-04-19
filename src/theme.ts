@@ -4,7 +4,7 @@ import { createTheme } from "@mui/material";
 
 const primaryColor = "#059169";
 const secondaryColor = "#34ED92";
-const defaultChatStyles = {
+export const defaultChatStyles = {
   primaryColor: "#059169",
   secondaryColor: "#efefef",
   fontColor: "#ffffff",

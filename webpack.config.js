@@ -24,6 +24,10 @@ module.exports = {
           filename: "images/[name][ext]", // Output path for the SVG files
         },
       },
+      {
+        test: /\.css$/, // Target .css files
+        use: ['style-loader', 'css-loader'] // Apply these loaders
+      },
     ],
   },
   resolve: {

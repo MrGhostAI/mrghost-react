@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import DefaultChatIcon from "./DefaultChatIcon";
 import Box from "@mui/material/Box";
 
-function ChatIcon({ bot, styles }) {
-  const [imageError, setImageError] = useState(false);
-
+function ChatIcon({ styles } : { styles: any }) {
   return (
     <Box
       sx={{
