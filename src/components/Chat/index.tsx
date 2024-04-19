@@ -843,3 +843,97 @@ export function BubbleChat({
     </BotProvider>
   );
 }
+
+function EmbedChat({shadow=false}) {
+  // const {bot} = useContext(BotContext);
+  // const {chat} = useContext(ChatContext);
+  const { bot } = useContext(BotContext);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isPromoteOpen, setIsPromoteOpen] = useState(true);
+
+  function requestResize(width : string, height : string) {
+    window.parent.postMessage(
+      {
+        type: 'resizeIframe',
+        width: width,
+        height: height,
+      },
+      '*'
+    );
+  }
+
+  const handleOnClick = () => {
+    console.log('clicked', isChatOpen);
+    if (!isChatOpen) {
+      requestResize('50rem', '95%');
+    } else {
+      requestResize('88px', '88px');
+    }
+    setIsChatOpen(!isChatOpen);
+  };
+
+  function handleOnClose() {
+    console.log('closed');
+    requestResize('88px', '88px');
+    setIsChatOpen(false);
+    setIsPromoteOpen(false);
+  }
+
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        height: '100svh',
+        width: '100%',
+        backgroundColor: 'transparent',
+      }}
+    >
+      <ChatIconButton
+        isOpen={isChatOpen}
+        handleOnClick={handleOnClick}
+        hasUnreadMessages={true}
+        defaultStyles={theme.components.DefaultChatStyles}
+      />
+      {isChatOpen && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: '6rem',
+            right: '1rem',
+            width: 'calc(100% - 2rem)',
+            height: 'calc(100% - 7rem)',
+            // border: '1px #DDD solid',
+            borderRadius: '1rem',
+            overflow: 'hidden',
+            boxShadow: shadow ? '0 0 0.75rem 0 rgba(0,0,0,0.2)' : 'none',
+          }}
+        >
+          <BotProvider botId={bot._id}>
+            <ChatProvider botId={bot._id} preview={false}>
+              <ChatApp
+                exitHandler={handleOnClick}
+                preview={false}
+                disableFooter={true}
+                chatStyles={{
+                  chat: {
+                    borderRadius: '1rem',
+                    border: 'none',
+                  },
+                }}
+              />
+            </ChatProvider>
+          </BotProvider>
+        </Box>
+      )}
+      {/* {bot?.styles?.showPromoteMessage && (
+        <Box sx={{ position: 'absolute', bottom: '1rem', right: '1rem' }}>
+          <PromoteMessage
+            open={isPromoteOpen}
+            setOpen={handleOnClose}
+            setIsChatOpen={handleOnClick}
+          />
+        </Box>
+      )} */}
+    </Box>
+  );
+};

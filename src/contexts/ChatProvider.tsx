@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useReducer, useContext, createContext } from 'react';
 import useChatSocket from '../components/Chat/ChatSocket';
 import chatReducer from '../components/Chat/ChatReducer';
-import {BotContext} from './BotContext';
 import {
   saveChatLocalStorage,
   getChatLocalStorage,
@@ -77,7 +76,6 @@ export const ChatProvider = ({
   const {
     chatSocket,
     isSocketConnected,
-    emitEditMessage,
     emitMessage,
     emitTyping,
   } = useChatSocket({
