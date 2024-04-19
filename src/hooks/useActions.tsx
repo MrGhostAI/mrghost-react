@@ -1,12 +1,28 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ActionContext } from "../contexts/ActionContext";
 
-export const useRegisterFunction = () => {
-  const { registerFunction } = useContext(ActionContext);
-  return registerFunction;
-};
+export const useRegisterFunction = (
+  func: Function,
+  deps: any[] = [],
+  schema: { name?: string, description?: string, properties?: any } = {}
+) => {
+  const { registerFunction, deregisterFunction } = useContext(ActionContext);
 
-export const useDeregisterFunction = () => {
-  const { deregisterFunction } = useContext(ActionContext);
-  return deregisterFunction;
+  useEffect(() => {
+    const fnDetails = {
+      name: schema?.name || func.name,
+      description: schema?.description || '',
+      parameters: {
+        type: 'object',
+        properties: schema?.properties || {},
+      },
+      fn: func,
+    };
+
+    registerFunction(fnDetails);
+
+    return () => {
+      deregisterFunction(fnDetails.name);
+    }
+  }, deps);
 };

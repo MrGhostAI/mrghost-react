@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ActionContext, ActionProvider } from "../contexts/index";
+import { ActionContext, ActionProvider, useRegisterFunction } from "../index";
 import { BubbleChat } from "../components/Chat";
 
 function ChatActionStory({
@@ -24,49 +24,37 @@ function WidgetStory({
   botId: string;
   chatUserId: string;
 }) {
-  const { registerFunction } = React.useContext(ActionContext);
   const [color, setColor] = React.useState("white" as string);
-  React.useEffect(() => {
-    console.log("registering function...");
-    registerFunction({
-      name: "greet",
-      fn: (name: string) => {
-        console.log(`Hello, ${name}!`);
+  useRegisterFunction(({name}
+  : {name: string}
+  ) => {
+    console.log(`Hello, ${name}!`);
+  }, [], {
+    name: "greet",
+    description: "A function that greets the world.",
+    properties: {
+      name: {
+        type: "string",
+        description: "The name of the user to greet.",
       },
-      parameters: {
-        type: "object",
-        properties: {
-          name: {
-            type: "string",
-            description: "The name of the user to greet.",
-          },
-        },
-      },
-      description: "A function that greets the user.",
-    });
-  }, []);
+    },
+  });
 
-  React.useEffect(() => {
-    console.log("registering function...");
-    registerFunction({
-      name: "change-background-color",
-      fn: ({color}: {color: string}) => {
-        console.log(`Changing background color to ${color}`);
-        setColor(color);
-        return "success"
+  useRegisterFunction(({color}
+  : {color: string}
+  ) => {
+    console.log(`Changing background color to ${color}`);
+    setColor(color);
+  }, [], {
+    name: "change-background-color",
+    description: "A function that changes the background color of the website.",
+    properties: {
+      color: {
+        type: "string",
+        description: "Any CSS color value (e.g. 'red', '#ff0000', 'rgb(255, 0, 0)').",
       },
-      parameters: {
-        type: "object",
-        properties: {
-          color: {
-            type: "string",
-            description: "Any CSS color value (e.g. 'red', '#ff0000', 'rgb(255, 0, 0)').",
-          },
-        },
-      },
-      description: "A function that changes the background color of the website.",
-    });
-  }, []);
+    },
+  });
 
   return (
     <>
