@@ -1,7 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { ChatWidget } from "../components";
+import { ChatApp } from "../components";
 import { ActionContext, ActionProvider } from "../contexts/index";
 
 function ChatActionStory({
@@ -46,7 +46,11 @@ function WidgetStory({
     });
   }, []);
 
-  return <ChatWidget botId={botId} chatUserId={chatUserId} />;
+  return (
+    <div style={{ height: "100vh", overflow: "hidden" }}>
+      <ChatApp botId={botId} userId={chatUserId} />
+    </div>
+  );
 }
 
 //👇 This default export determines where your story goes in the story list

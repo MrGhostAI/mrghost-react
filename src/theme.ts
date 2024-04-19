@@ -11,7 +11,7 @@ const defaultChatStyles = {
   fontType: "Arial",
   backgroundColor: "#ffffff",
 };
-export const HappyMLTheme = createTheme({
+export const theme = createTheme({
   palette: {
     primary: {
       main: primaryColor, // Change the primary color to orange (#ff5722)
@@ -179,7 +179,7 @@ export const HappyMLTheme = createTheme({
 const darkBackground = "#262638";
 const darkBackgroundDarker = "#151527";
 const darkBackgroundLight = "#484873";
-export const HappyMLDarkTheme = createTheme({
+export const darkTheme = createTheme({
   palette: {
     primary: {
       main: "#059169", // Change the primary color to orange (#ff5722)

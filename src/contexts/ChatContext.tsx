@@ -57,7 +57,7 @@ const WEB_SOCKET_API_URL = "http://localhost:3000/chat";
 // const WEB_SOCKET_API_URL =
 //   process.env.NODE_ENV === "development"
 //     ? "http://localhost:3000/chat"
-//     : "https://www.happyml.com/chat";
+//     : "https://app.mrghost.ai/chat";
 
 export const ChatProvider = ({
   botId,

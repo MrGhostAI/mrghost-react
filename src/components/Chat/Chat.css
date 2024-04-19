@@ -1,0 +1,86 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.dashboard {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.message-text img {
+    width: 100%;
+    max-width: 20rem;
+}
+
+.source-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.source-element {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.source-element a {
+    margin-left: 10px;
+}
+.chat-container {
+  max-width: 600px;
+  max-height: 600px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 40px auto;
+  box-sizing: border-box;
+}
+.message-area {
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.input-container {
+  display: flex;
+}
+/* .message-input {
+    flex: 1;
+    padding: 5px;
+} */
+/* .send-button {
+    padding: 5px 10px;
+} */
+.message {
+    width: 90%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+.mine {
+    background-color: #0084FF;
+    color: #fff;
+    margin-left: auto;
+    order: 2;
+}
+.other {
+    background-color: #F0F0F0;
+    color: #000;
+    margin-right: auto;
+    order: 1;
+}
+.send-icon-hover:hover {
+    cursor: pointer;
+  }
+
+.message-text * {
+    margin: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+}

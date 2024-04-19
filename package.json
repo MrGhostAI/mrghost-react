@@ -78,5 +78,9 @@
       "react-app/jest",
       "plugin:storybook/recommended"
     ]
+  },
+  "dependencies": {
+    "showdown": "^2.1.0",
+    "styled-components": "^6.1.8"
   }
 }
