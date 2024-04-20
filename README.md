@@ -17,7 +17,6 @@ import { ChatWidget } from "mrghost";
 ### Example
 
 ```javascript
-import React from "react";
 import { ChatWidget } from "mrghost";
 
 function App() {

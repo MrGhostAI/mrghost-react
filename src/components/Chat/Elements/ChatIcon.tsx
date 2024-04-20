@@ -1,6 +1,6 @@
-import React from "react";
+// import React from "react";
 import DefaultChatIcon from "./DefaultChatIcon";
-import Box from "@mui/material/Box";
+import {Box} from "../../../Utils/mui";
 
 function ChatIcon({ styles } : { styles: any }) {
   return (

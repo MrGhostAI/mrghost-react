@@ -1,9 +1,6 @@
-import React, {
-  useState,
-  createContext,
-  FunctionComponent,
-  ReactNode,
-} from "react";
+'use client';
+
+import * as React from "react";
 
 export interface ParametersSchema {
   type: string;
@@ -60,23 +57,23 @@ interface ActionContextType {
   deregisterFunction: (name: string) => void;
 }
 
-export const ActionContext = createContext<ActionContextType>({
+export const ActionContext = React.createContext<ActionContextType>({
   functions: [],
   registerFunction: () => {},
   deregisterFunction: () => {},
 });
 
 interface ActionProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 /**
  * A provider that allows users to register/de-register custom functions for use in the chat bot.
  */
-export const ActionProvider: FunctionComponent<ActionProviderProps> = ({
+export const ActionProvider: React.FunctionComponent<ActionProviderProps> = ({
   children,
 }) => {
-  const [functions, setFunctions] = useState<FunctionDetails[]>([]);
+  const [functions, setFunctions] = React.useState<FunctionDetails[]>([]);
 
   const registerFunction = (fn: FunctionDetails) => {
     setFunctions((prevFunctions) => [...prevFunctions, fn]);

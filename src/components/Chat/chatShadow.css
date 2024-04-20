@@ -1,0 +1,36 @@
+.scrollable-container {
+    position: relative;
+    overflow-y: auto;
+    height: 300px;
+  }
+  
+  .scrollable-container::before,
+  .scrollable-container::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0px;
+    pointer-events: none; /* Make shadows non-interactive */
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out; /* Transition for fading in and out */
+  }
+  
+  .scrollable-container::before {
+    top: 0;
+    box-shadow: 0px -10px 15px 10px rgba(0,0,0,0.3);
+  }
+  
+  .scrollable-container::after {
+    bottom: 0;
+    box-shadow: 0px 10px 15px 10px rgba(0,0,0,0.3); 
+  }
+  
+  .scrollable-container.shadow-top::before {
+    opacity: 1; /* Visible state */
+  }
+  
+  .scrollable-container.shadow-bottom::after {
+    opacity: 1; /* Visible state */
+  }

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useLayoutEffect, useContext, useEffect, useRef } from 'react';
 import {
   TextField,
@@ -5,19 +7,20 @@ import {
   Box,
   Typography,
   Divider,
-  Badge,
+  // Badge,
   Tooltip,
-} from '@mui/material';
-import IconButton from '@mui/material/IconButton';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import PulsatingDot from './PulsatingDot';
+  IconButton,
+} from '../../Utils/mui';
+import RefreshIcon from './Elements/RefreshIcon';
+// import PulsatingDot from './PulsatingDot';
 import styled from 'styled-components';
 import ExitIcon from './ExitIcon';
-import './Chat.css'
+import './Chat.css';
+import './chatShadow.css';
 
 // import PromoteMessage from './PromoteMessage.js';
 import { BotProvider, BotContext } from '../../contexts/BotContext';
-import {theme, defaultChatStyles} from '../../theme';
+import {defaultChatStyles} from '../../theme';
 import { ChatContext, ChatProvider } from '../../contexts/ChatProvider';
 import ChatIcon from './Elements/ChatIcon';
 import { getHumanReadableDate } from '../../Utils/Date';
@@ -172,7 +175,7 @@ const ChatIconButton = React.memo(function ChatIconButton({
   defaultStyles = {},
 } : {icon: any, handleOnClick: () => void, defaultStyles: any}){
   const { bot } = useContext(BotContext);
-  const {hasUnreadMessages} = useContext(ChatContext);
+  // const {hasUnreadMessages} = useContext(ChatContext);
 
   if (!bot) return null;
 
@@ -194,19 +197,21 @@ const ChatIconButton = React.memo(function ChatIconButton({
       }}
       disableRipple
     >
-      <Badge
+      {/* <Badge
         overlap="circular"
-        badgeContent={<PulsatingDot color={theme.palette.error.main} />}
+        badgeContent={<PulsatingDot color={"red"} />}
         invisible={!hasUnreadMessages}
         sx={{
-          // filter: isOpen ? 'brightness(120%) contrast(70%)' : 'none' ,
           transition: 'filter 0.3s ease',
         }}
       >
         {
           icon ? icon : <ChatIcon styles={styles} />
         }
-      </Badge>
+      </Badge> */}
+      {
+          icon ? icon : <ChatIcon styles={styles} />
+        }
     </IconButton>
   );
 });
@@ -566,7 +571,8 @@ export function ChatClient({
   // const chatId = null;
   // const refreshChatLocalStorage = null;
   const messagesEndRef = useRef(null);
-  const parentRef = useRef(null);
+  const scrollRef = useRef(null);
+  const containerRef = useRef(null);
   const [hasInitialScroll, setHasInitialScroll] = useState(false);
   const [messagesCount, setMessagesCount] = useState(0);
   const myRoles = isAdmin ? ['admin', 'ai'] : ['user'];
@@ -613,7 +619,7 @@ export function ChatClient({
     setTimeout(() => {
       const messagesEnd: any = messagesEndRef.current;
       const parent: any
-       = parentRef.current;
+       = scrollRef.current;
 
       if (messagesEnd && parent) {
         const topPosition = messagesEnd.offsetTop;
@@ -634,12 +640,47 @@ export function ChatClient({
   useLayoutEffect(scrollToBottom, [messagesCount, preview, blank]);
 
   const [hasShadow, setHasShadow] = useState(false);
+  const [shadowStyle, setShadowStyle] = useState({});
+
+  const handleScroll = () => {
+    const element = scrollRef.current;
+    if (!element) return;
+
+    const scrollTop = element.scrollTop;
+    const scrollHeight = element.scrollHeight;
+    const clientHeight = element.clientHeight;
+
+    const atTop = scrollTop === 0;
+    const atBottom = scrollTop + clientHeight >= scrollHeight;
+
+    const containerElement = containerRef.current;
+    if (atTop && atBottom) {
+      containerElement.classList.remove('shadow-top', 'shadow-bottom');
+    } else if (atTop) {
+      containerElement.classList.remove('shadow-top');
+      containerElement.classList.add('shadow-bottom');
+    } else if (atBottom) {
+      containerElement.classList.add('shadow-top');
+      containerElement.classList.remove('shadow-bottom');
+    } else {
+      containerElement.classList.add('shadow-top', 'shadow-bottom');
+    }
+  };
 
   // Function to handle scroll events
-  const handleScroll = (e: any) => {
-    const scrollTop = e.target.scrollTop; // Get how far it's been scrolled
-    setHasShadow(scrollTop > 0); // Set shadow state based on scroll position
-  };
+  useEffect(() => {
+    const element = scrollRef.current;
+    element.addEventListener('scroll', handleScroll);
+
+    return () => {
+      element.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    // when messages are added, check handleScroll
+    handleScroll();
+  }, [messages]);
 
   useEffect(() => {
     console.log('chat id changed');
@@ -665,16 +706,18 @@ export function ChatClient({
       <Box sx={{
         flexGrow: 1,
         position: 'relative',
-        overflow: 'hidden',
-      }}>
+        overflow: 'hidden'
+      }}
+      className="scrollable-container"
+      ref={containerRef}
+      >
         <Box
           sx={{
             height: '100%',
             backgroundColor: chatStyles?.backgroundColor || 'none',
             overflowY: 'auto',
           }}
-          ref={parentRef}
-          onScroll={handleScroll}
+          ref={scrollRef}
         >
           <Box
             sx={{
@@ -781,6 +824,11 @@ export function BubbleChat({
   const { functions } = useContext(ActionContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(isChatOpen);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setLoaded(true); // Trigger the fade-in effect after the component mounts
+  }, []);
 
   useEffect(() => {
     if (isChatOpen) {
@@ -801,48 +849,50 @@ export function BubbleChat({
   };
 
   return (
-    <BotProvider botId={botId} domain={domain}>
-      <ChatProvider
-        botId={botId}
-        chatId={chatId}
-        botUserId={userId}
-        preview={false}
-        additionalFunctions={functions}
-        domain={domain}
-      >
-        <ChatIconButton
-          icon={icon}
-          handleOnClick={handleOnClick}
-          defaultStyles={{}}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: '6rem',
-            right: '1rem',
-            width: 'calc(100% - 2rem)',
-            maxWidth: '30rem',
-            height: 'calc(100% - 7rem)',
-            borderRadius: '1rem',
-            overflow: 'hidden',
-            boxShadow: '0 0 0.75rem 0 rgba(0,0,0,0.2)',
-            transform: isChatOpen ? 'scale(1)' : 'scale(0.9)',
-            opacity: isChatOpen ? 1 : 0,
-            visibility: isChatVisible ? 'visible' : 'hidden',
-            transition: 'transform 0.1s ease-in-out, opacity 0.1s ease-in-out',
-            transformOrigin: 'right bottom'
-          }}
+    <div style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 2147483647, opacity: loaded ? 1 : 0, transition: 'opacity 0.3s ease' }}>
+      <BotProvider botId={botId} domain={domain}>
+        <ChatProvider
+          botId={botId}
+          chatId={chatId}
+          botUserId={userId}
+          preview={false}
+          additionalFunctions={functions}
+          domain={domain}
         >
-          <ChatReadMonitor isChatOpen={isChatOpen} />
-          <ChatClient
-            chatStyles={bot?.styles || {}}
-            exitHandler={handleOnClick}
-            preview={false}
-            messageComponent={DefaultMessage}
-            blank={false}
+          <ChatIconButton
+            icon={icon}
+            handleOnClick={handleOnClick}
+            defaultStyles={{}}
           />
-        </Box>
-      </ChatProvider>
-    </BotProvider>
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: '6rem',
+              right: '1rem',
+              width: 'calc(100vw - 2rem)',
+              maxWidth: '30rem',
+              height: 'calc(100vh - 7rem)',
+              borderRadius: '1rem',
+              overflow: 'hidden',
+              boxShadow: '0 0 0.75rem 0 rgba(0,0,0,0.2)',
+              transform: isChatOpen ? 'scale(1)' : 'scale(0.9)',
+              opacity: isChatOpen ? 1 : 0,
+              visibility: isChatVisible ? 'visible' : 'hidden',
+              transition: 'transform 0.1s ease-in-out, opacity 0.1s ease-in-out',
+              transformOrigin: 'right bottom'
+            }}
+          >
+            <ChatReadMonitor isChatOpen={isChatOpen} />
+            <ChatClient
+              chatStyles={bot?.styles || {}}
+              exitHandler={handleOnClick}
+              preview={false}
+              messageComponent={DefaultMessage}
+              blank={false}
+            />
+          </Box>
+        </ChatProvider>
+      </BotProvider>
+    </div>
   );
 }

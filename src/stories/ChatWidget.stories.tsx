@@ -1,4 +1,6 @@
-import React from "react";
+'use client';
+
+import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { ChatApp } from "../components";

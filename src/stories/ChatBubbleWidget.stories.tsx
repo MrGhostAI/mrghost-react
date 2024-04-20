@@ -1,7 +1,10 @@
+'use client';
+
 import type { Meta, StoryObj } from "@storybook/react";
-import React from "react";
+import * as React from "react";
 import { BubbleChat } from "../components/Chat";
-import { ActionProvider, useRegisterFunction } from "../index";
+import { ActionProvider } from "../contexts/index";
+import { useRegisterFunction } from "../hooks/index";
 
 function ChatActionStory({
   botId,

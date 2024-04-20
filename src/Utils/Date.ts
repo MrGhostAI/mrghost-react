@@ -1,4 +1,4 @@
-
+'use client';
 
 export const GetHumanDate = (dateString : string) => {
     const date = new Date(dateString);

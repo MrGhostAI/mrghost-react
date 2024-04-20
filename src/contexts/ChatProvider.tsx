@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useReducer, useContext, createContext } from 'react';
 import useChatSocket from '../components/Chat/ChatSocket';
 import chatReducer from '../components/Chat/ChatReducer';

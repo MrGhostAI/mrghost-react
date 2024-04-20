@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 
 function DefaultChatIcon({ color1, color2, color3, width = '100%' } : { color1: string, color2: string, color3: string, width?: string }) {
   return (

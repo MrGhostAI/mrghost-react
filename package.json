@@ -1,7 +1,7 @@
 {
   "package-name": "mrghost",
   "name": "mrghost",
-  "version": "0.0.7",
+  "version": "0.0.10",
   "authors": [
     "Evan Phibbs"
   ],
@@ -23,8 +23,8 @@
     "url": "https://github.com/MrGhostAI/mrghost-react"
   },
   "private": false,
-  "main": "dist/bundle.js",
-  "module": "dist/bundle.js",
+  "main": "src/index.tsx",
+  "module": "src/index.tsx",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
@@ -85,6 +85,8 @@
     ]
   },
   "dependencies": {
+    "@emotion/cache": "^11.11.0",
+    "@emotion/server": "^11.11.0",
     "showdown": "^2.1.0",
     "styled-components": "^6.1.8"
   }

@@ -1,4 +1,6 @@
-import React from "react";
+'use client';
+
+import * as React from "react";
 import io, { Socket } from "socket.io-client";
 import { ActionContext, ActionResponse } from "./ActionContext";
 

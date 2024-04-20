@@ -1,4 +1,6 @@
-import React from "react";
+'use client';
+
+import * as React from "react";
 
 // const DOMAIN = process.env.NODE_ENV === 'development' ? 'https://monkey-bright-closely.ngrok-free.app' : 'https://app.mrghost.ai';
 
