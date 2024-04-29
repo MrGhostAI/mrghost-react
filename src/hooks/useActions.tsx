@@ -6,7 +6,7 @@ import { ActionContext } from "../contexts/ActionContext";
 export const useRegisterFunction = (
   func: Function,
   deps: any[] = [],
-  schema: { name?: string, description?: string, properties?: any } = {}
+  schema: { name?: string, description?: string, parameters?: any } = {}
 ) => {
   const { registerFunction, deregisterFunction } = useContext(ActionContext);
 
@@ -14,9 +14,9 @@ export const useRegisterFunction = (
     const fnDetails = {
       name: schema?.name || func.name,
       description: schema?.description || '',
-      parameters: {
+      parameters: schema?.parameters || {
         type: 'object',
-        properties: schema?.properties || {},
+        properties: {},
       },
       fn: func,
     };

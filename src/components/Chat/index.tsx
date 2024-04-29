@@ -541,6 +541,23 @@ export function InputBar({ sendMessage, chatStyles, preview } : {sendMessage: (t
   );
 }
 
+function getChatButtonStyles(isTypingUser) {
+  return {
+    visibility: isTypingUser ? 'visible' : 'hidden',
+    opacity: isTypingUser ? 1 : 0,
+    transition: 'visibility 0.3s ease, opacity 0.3s ease',
+    position: 'absolute',
+    bottom: '0.75rem',
+    left: '1.5rem',
+    padding: '0.25rem 0.5rem',
+    boxShadow: '0 0 0.5rem 0 rgba(0,0,0,0.2)',
+    backgroundColor: `rgba(255, 255, 255, 0.6)`,
+    borderRadius: '0.5rem',
+    backdropFilter: 'blur(4px)',
+    zIndex: 1000
+  };
+}
+
 export function ChatClient({
   disableHeader = false,
   disableFooter = false,
@@ -618,8 +635,7 @@ export function ChatClient({
     console.log('scrolling...', behavior);
     setTimeout(() => {
       const messagesEnd: any = messagesEndRef.current;
-      const parent: any
-       = scrollRef.current;
+      const parent: any = scrollRef.current;
 
       if (messagesEnd && parent) {
         const topPosition = messagesEnd.offsetTop;
@@ -692,7 +708,7 @@ export function ChatClient({
   }, [isTypingUser]);
 
   return (
-    <Box sx={styles.chat}>
+    <Box sx={{...styles.chat, backgroundColor: chatStyles?.backgroundColor || '#fff'}}> 
       {disableHeader ? null : (
         <Box sx={{ boxShadow: hasShadow ? '0 2px 10px rgba(0,0,0,0.1)' : 'none',
         transition: 'box-shadow 0.3s ease-in-out' }}>
@@ -732,24 +748,48 @@ export function ChatClient({
           <Typography
             variant="caption"
             color="#000"
-            sx={{
-              visibility: isTypingUser ? 'visible' : 'hidden',
-              opacity: isTypingUser ? 1 : 0,
-              transition: 'visibility 0.3s ease, opacity 0.3s ease',
-              position: 'absolute',
-              bottom: '0.75rem',
-              left: '1.5rem',
-              padding: '0.25rem 0.5rem',
-              boxShadow: '0 0 0.5rem 0 rgba(0,0,0,0.2)',
-              backgroundColor: `rgba(255, 255, 255, 0.6)`,
-              borderRadius: '0.5rem',
-              backdropFilter: 'blur(4px)',
-              zIndex: 1000
-            }}
+            sx={getChatButtonStyles(isTypingUser)}
             component="div"
           >
             {isTypingUser} is typing...
           </Typography>
+          {
+            bot?.settings?.quickMessages && bot.settings?.quickMessages.length > 0 ? (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: '0.5rem',
+                  right: '1.5rem',
+                  zIndex: 1000,
+                  display: 'flex',
+                  gap: '0.5rem',
+                  textAlign: 'left',
+                  textTransform: 'none',
+                  justifyContent: 'flex-start',
+                  margin: '0.5rem 0',
+                  padding: '0.5rem 1rem',
+                }}
+              >
+                {
+                  bot.settings?.quickMessages.map((message, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => sendMessage(message)}
+                      sx={{
+                        padding: '0.5rem',
+                        backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 0 0.5rem 0 rgba(0,0,0,0.2)',
+                        backdropFilter: 'blur(4px)',
+                      }}
+                    >
+                      {message}
+                    </Button>
+                  ))
+                }
+              </Box>
+            ) : null
+          }
         </Box>
       </Box>
       <InputBar
@@ -870,7 +910,7 @@ export function BubbleChat({
               bottom: '6rem',
               right: '1rem',
               width: 'calc(100vw - 2rem)',
-              maxWidth: '30rem',
+              maxWidth: '25rem',
               height: 'calc(100vh - 7rem)',
               borderRadius: '1rem',
               overflow: 'hidden',
