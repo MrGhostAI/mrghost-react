@@ -7,6 +7,7 @@ import { ActionContext, ActionResponse } from "./ActionContext";
 interface SavedChatMessage {
   chatId: string;
   chatUserId: string;
+  botUser: string;
   messages: Message[];
 }
 
@@ -31,7 +32,8 @@ export interface Message {
 export interface ChatProviderProps {
   botId: string;
   chatId: string | null;
-  chatUserId: string;
+  chatUserId: string | null;
+  domain?: string;
   children: React.ReactNode;
 }
 
@@ -39,12 +41,14 @@ export interface ChatContextType {
   messages: Message[];
   sendMessage: (text: string) => void;
   isAiTyping: boolean;
+  botUser: any;
 }
 
 export const ChatContext = React.createContext<ChatContextType>({
   messages: [],
   sendMessage: () => {},
   isAiTyping: false,
+  botUser: {},
 });
 
 const saveChatToLocalStorage = (botId: string, key: string, data: string) => {
@@ -65,6 +69,7 @@ export const ChatProvider = ({
   botId,
   chatId,
   chatUserId,
+  domain = WEB_SOCKET_API_URL,
   children,
 }: ChatProviderProps) => {
   const [messages, setMessages] = React.useState<Message[]>([]);
@@ -74,7 +79,7 @@ export const ChatProvider = ({
 
   // Create a socket connection on component mount
   React.useEffect(() => {
-    const _socket = io(WEB_SOCKET_API_URL);
+    const _socket = io(domain || WEB_SOCKET_API_URL);
 
     // If the socket connection is successful, set the socket state
     if (_socket) {
@@ -207,7 +212,7 @@ export const ChatProvider = ({
   };
 
   return (
-    <ChatContext.Provider value={{ messages, sendMessage, isAiTyping }}>
+    <ChatContext.Provider value={{ botUser, messages, sendMessage, isAiTyping }}>
       {children}
     </ChatContext.Provider>
   );

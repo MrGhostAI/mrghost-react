@@ -14,7 +14,9 @@ interface ChatContextType {
   messages: any[];
   isTypingUser: any;
   sendMessage: (text: string, callback?: () => void) => void;
+  setBotUserData: (data: Object) => void;
   userIsTyping: () => void;
+  emitMessageBotUser: ({ message, prompt } : { message?: string, prompt?: string }) => void;
   isAdmin: boolean;
   refreshChatLocalStorage: (botId: string) => void;
   chatId: string | null;
@@ -28,6 +30,8 @@ export const ChatContext = createContext<ChatContextType>({
   messages: [],
   isTypingUser: null,
   sendMessage: () => {},
+  setBotUserData: () => {},
+  emitMessageBotUser: () => {},
   userIsTyping: () => {},
   isAdmin: false,
   refreshChatLocalStorage: () => {},
@@ -46,6 +50,7 @@ export const ChatProvider = ({
   postLocalStorage = null,
   preview = false,
   additionalFunctions = null,
+  contexts=null,
   children,
 } : {
   domain?: string,
@@ -66,6 +71,7 @@ export const ChatProvider = ({
   const [botUserId, setBotUserId] = useState(
     startBotUserId || getChatLocalStorage(botId, 'botUserId')
   );
+  const [botUser, setBotUser] = useState(null); // [TODO] Implement botUser state
   const [chatState, dispatch] = useReducer(chatReducer, {
     chat: null,
     messages: [],
@@ -79,7 +85,9 @@ export const ChatProvider = ({
     chatSocket,
     isSocketConnected,
     emitMessage,
+    emitBotUserData,
     emitTyping,
+    emitMessageBotUser,
   } = useChatSocket({
     domain,
     isAdmin,
@@ -137,6 +145,7 @@ export const ChatProvider = ({
       // Update chatId and chatUserId from the response if they are different
       updateChatId(response.chatId);
       updateBotUserId(response.botUserId);
+      setBotUser(response.botUser || {});
 
       // Update messages if provided in the response
       dispatch({ type: 'SET_MESSAGES', payload: response.messages || [] });
@@ -148,16 +157,30 @@ export const ChatProvider = ({
     console.log('additionalFunctions', additionalFunctions);
     if (!text) return;
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const joinedContexts = contexts ? contexts.join('. ') : '';
     const messageObject = {
       text,
       botId,
       chatId,
       botUserId,
       additionalFunctions,
+      messagePrompt: joinedContexts,
       tz,
     };
     console.log('messageObject', messageObject);
     emitMessage(messageObject, updateBotUserId, updateChatId, callback);
+  }
+
+  function messageBotUser({ message, prompt } : { message?: string, prompt?: string }) {
+    console.log('messageBotUser', message, prompt);
+    emitMessageBotUser({ message, prompt });
+  }
+
+  function setBotUserData(data : Object) {
+    setBotUser((prevBotUser) => (
+      { ...(prevBotUser || {}), data: {...(prevBotUser?.data || {}), ...data} }
+    ));
+    emitBotUserData(data);
   }
 
   function userIsTyping() {
@@ -178,7 +201,10 @@ export const ChatProvider = ({
         hasUnreadMessages,
         setHasUnreadMessages,
         sendMessage,
+        setBotUserData,
+        botUser,
         userIsTyping,
+        messageBotUser,
         isAdmin,
         refreshChatLocalStorage,
         chatId,

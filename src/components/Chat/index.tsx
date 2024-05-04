@@ -220,17 +220,18 @@ export function MainMessageComponent({
   message,
   myRoles,
   margin = '10px 0',
-  chatStyles
-} : {message: any, myRoles: string[], margin: string, chatStyles: any}) {
+  chatStyles,
+  aboveBubble=false,
+} : {message: any, myRoles: string[], margin: string, chatStyles: any, aboveBubble?: boolean}) {
   console.log('Rerender MainMessageComponent', message.text);
   const { bot } = useContext(BotContext);
   console.log('MainMessageComponent bot', bot);
   const isRight = myRoles.includes(message.role || '');
-  const senderStyles = isRight ? styles.right : styles.left;
+  const senderStyles = {...(isRight ? styles.right : styles.left), ...chatStyles.senderStyles};
   const leftCorner = { borderRadius: '24px 24px 24px 0px' };
   const rightCorner = { borderRadius: '24px 24px 0px 24px' };
   const bubbleStyle = isRight ? rightCorner : leftCorner;
-
+  const aboveBubbleStyle = aboveBubble ? { maxWidth: '100%', boxShadow: '0 0 0.75rem 0 rgba(0,0,0,0.2)' } : {};
   useEffect(() => {
     console.log('MainMessageComponent first', message.text);
   }, []);
@@ -273,7 +274,7 @@ export function MainMessageComponent({
     <Box
       sx={{
         width: '100%',
-        textAlign: isRight ? 'right' : 'left',
+        textAlign: isRight || aboveBubble ? 'right' : 'left',
         marginBottom: '1rem',
       }}
     >
@@ -297,6 +298,7 @@ export function MainMessageComponent({
             ? chatStyles?.primaryColor || '#333'
             : chatStyles?.secondaryColor || '#FFFFFF',
           color: isRight ? '#fff' : chatStyles?.fontColor || '#000000',
+          ...aboveBubbleStyle,
         }}
       >
         <Typography
@@ -371,7 +373,7 @@ export function MessageList({
   
         return (
           <React.Fragment key={message._id}>
-            {(timeGap > 900 || index === 0) && message.createdAt && (
+            {(timeGap > 900) && message.createdAt && (
               <Box sx={{ margin: '0.5rem 0', textAlign: 'center' }}>
                 <Typography variant="caption" sx={{ color: '#333' }}>
                   {getHumanReadableDate(message.createdAt)}
@@ -486,12 +488,27 @@ export function Footer({chatStyles} : {chatStyles: any}) {
 export function InputBar({ sendMessage, chatStyles, preview } : {sendMessage: (text: string, callback?: () => void) => void, chatStyles: any, preview: boolean}) {
   const [text, setText] = useState('');
   const {userIsTyping} = useContext(ChatContext);
+  const [blockSubsequent, setBlockSubsequent] = useState(false);
   const onSubmit = (event : any) => {
         event.preventDefault();
+        if (blockSubsequent) return;
         sendMessage(text, () => {
           setText('');
+          setBlockSubsequent(false);
         });
+        setBlockSubsequent(true);
       }
+  const textFieldRef = useRef(null);
+
+  useEffect(() => {
+    // Check if the TextField reference exists
+    if (textFieldRef.current) {
+      // Focus the TextField
+      textFieldRef.current.focus({
+        preventScroll: true
+      });
+    }
+  }, []);
   return (
     <Box
       sx={{
@@ -509,7 +526,7 @@ export function InputBar({ sendMessage, chatStyles, preview } : {sendMessage: (t
         name="message"
         fullWidth
         autoComplete="off"
-        inputRef={input => input && input.focus()}
+        inputRef={textFieldRef}
         sx={{
           ...styles.inputText,
           fontFamily: `${chatStyles?.fontType || ''} !important`,
@@ -658,6 +675,11 @@ export function ChatClient({
   const [hasShadow, setHasShadow] = useState(false);
   const [shadowStyle, setShadowStyle] = useState({});
 
+  // const handleScroll = (e) => {
+  //   e.stopPropagation();
+  //   // Your scroll handling logic here
+  // };
+
   const handleScroll = () => {
     const element = scrollRef.current;
     if (!element) return;
@@ -724,7 +746,7 @@ export function ChatClient({
         position: 'relative',
         overflow: 'hidden'
       }}
-      className="scrollable-container"
+      // className="scrollable-container"
       ref={containerRef}
       >
         <Box
@@ -803,33 +825,17 @@ export function ChatClient({
 }
 
 export function ChatApp({
-  botId,
-  chatId = null,
-  userId = null,
-  visible = true,
-  domain = 'https://mrghost.ai',
+  visible = true
 } : {botId: string, chatId?: string | null, userId?: string | null, visible?: boolean, domain?: string}) {
-  const { functions } = useContext(ActionContext);
   return (
     <div style={{ display: visible ? 'block' : 'none', height: '100%', width: '100%' }}>
-      <BotProvider botId={botId} domain={domain}>
-        <ChatProvider
-          domain={domain}
-          botId={botId}
-          chatId={chatId}
-          botUserId={userId}
-          preview={false}
-          additionalFunctions={functions}
-        >
-          <ChatClient
-            chatStyles={{}}
-            exitHandler={null}
-            preview={false}
-            messageComponent={DefaultMessage}
-            blank={false}
-          />
-        </ChatProvider>
-      </BotProvider>
+      <ChatClient
+        chatStyles={{}}
+        exitHandler={null}
+        preview={false}
+        messageComponent={DefaultMessage}
+        blank={false}
+      />
     </div>
   );
 }
@@ -854,14 +860,10 @@ function ChatReadMonitor({isChatOpen} : {isChatOpen: boolean}) {
 }
 
 export function BubbleChat({
-  botId,
-  chatId = null,
-  userId = null,
-  icon = null,
-  domain = 'https://mrghost.ai',
+  icon = null
 } : {botId: string, chatId?: string | null, userId?: string | null, visible?: boolean, icon?: any | null, domain?: string}) {
   const { bot } = useContext(BotContext);
-  const { functions } = useContext(ActionContext);
+  const { hasUnreadMessages, setHasUnreadMessages, messages } = useContext(ChatContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(isChatOpen);
   const [loaded, setLoaded] = useState(false);
@@ -887,52 +889,76 @@ export function BubbleChat({
     console.debug('clicked', isChatOpen);
     setIsChatOpen(!isChatOpen);
   };
+  
+  let lastMessage = messages[messages.length-1] || {};
+  if (lastMessage.role !== 'ai') {
+    lastMessage = {};
+  }
+  const lastMessageText = lastMessage?.text || '';
 
   return (
     <div style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 2147483647, opacity: loaded ? 1 : 0, transition: 'opacity 0.3s ease' }}>
-      <BotProvider botId={botId} domain={domain}>
-        <ChatProvider
-          botId={botId}
-          chatId={chatId}
-          botUserId={userId}
+      <ChatIconButton
+        icon={icon}
+        handleOnClick={handleOnClick}
+        defaultStyles={{}}
+      />
+      <Box sx={{ 
+        position: 'absolute', 
+        bottom: '5rem',
+        right: '1rem', width: 'calc(100vw - 2rem)',
+        maxWidth: '20rem',
+        zIndex: 2147483647,
+        display: hasUnreadMessages && lastMessageText ? 'block' : 'none',
+      }}>
+        <span
+        onClick={() => setHasUnreadMessages(false)} 
+        style={{ 
+          cursor: 'pointer', 
+          position: 'absolute', 
+          top: '-0.5rem', 
+          right: '-0.5rem',
+          zIndex: 1000, 
+          color: '#333', 
+          fontSize: '1rem', 
+          backgroundColor: 'rgba(255, 255, 255, 0.6)', 
+          boxShadow: '0 0 0.5rem 0 rgba(0,0,0,0.2)',
+          borderRadius: '2rem', 
+          padding: '0rem 0.4rem',
+          backdropFilter: 'blur(4px)'
+        }}>
+          &times;
+        </span> 
+        <MainMessageComponent message={{text: lastMessageText}} myRoles={['user']} margin={'0'} chatStyles={{}} aboveBubble={true} />
+      </Box>
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: '6rem',
+          right: '1rem',
+          width: 'calc(100vw - 2rem)',
+          maxWidth: '25rem',
+          height: 'calc(100vh - 7rem)',
+          maxHeight: '40rem',
+          borderRadius: '1rem',
+          overflow: 'hidden',
+          boxShadow: '0 0 0.75rem 0 rgba(0,0,0,0.2)',
+          transform: isChatOpen ? 'scale(1)' : 'scale(0.9)',
+          opacity: isChatOpen ? 1 : 0,
+          visibility: isChatVisible ? 'visible' : 'hidden',
+          transition: 'transform 0.1s ease-in-out, opacity 0.1s ease-in-out',
+          transformOrigin: 'right bottom'
+        }}
+      >
+        <ChatReadMonitor isChatOpen={isChatOpen} />
+        <ChatClient
+          chatStyles={bot?.styles || {}}
+          exitHandler={handleOnClick}
           preview={false}
-          additionalFunctions={functions}
-          domain={domain}
-        >
-          <ChatIconButton
-            icon={icon}
-            handleOnClick={handleOnClick}
-            defaultStyles={{}}
-          />
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: '6rem',
-              right: '1rem',
-              width: 'calc(100vw - 2rem)',
-              maxWidth: '25rem',
-              height: 'calc(100vh - 7rem)',
-              borderRadius: '1rem',
-              overflow: 'hidden',
-              boxShadow: '0 0 0.75rem 0 rgba(0,0,0,0.2)',
-              transform: isChatOpen ? 'scale(1)' : 'scale(0.9)',
-              opacity: isChatOpen ? 1 : 0,
-              visibility: isChatVisible ? 'visible' : 'hidden',
-              transition: 'transform 0.1s ease-in-out, opacity 0.1s ease-in-out',
-              transformOrigin: 'right bottom'
-            }}
-          >
-            <ChatReadMonitor isChatOpen={isChatOpen} />
-            <ChatClient
-              chatStyles={bot?.styles || {}}
-              exitHandler={handleOnClick}
-              preview={false}
-              messageComponent={DefaultMessage}
-              blank={false}
-            />
-          </Box>
-        </ChatProvider>
-      </BotProvider>
+          messageComponent={DefaultMessage}
+          blank={false}
+        />
+      </Box>
     </div>
   );
 }

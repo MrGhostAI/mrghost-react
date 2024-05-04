@@ -3,6 +3,18 @@
 import { useContext, useEffect } from "react";
 import { ActionContext } from "../contexts/ActionContext";
 
+export const useRegisterContext = (context: string) => {
+  const { registerContext, deregisterContext } = useContext(ActionContext);
+
+  useEffect(() => {
+    registerContext(context);
+
+    return () => {
+      deregisterContext(context);
+    }
+  }, []);
+}
+
 export const useRegisterFunction = (
   func: Function,
   deps: any[] = [],

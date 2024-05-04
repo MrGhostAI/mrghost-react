@@ -158,6 +158,22 @@ const useChatSocket = ({ domain = "https://app.mrghost.ai", isAdmin, preview, po
         callback(messageReceipt);
       });
     },
+    emitBotUserData: (botUserData: any) => {
+      if (!chatSocket) return;
+      console.log('Bot user data:', botUserData);
+      chatSocket.emit('set_bot_user_data', botUserData, (response : any) => {
+        console.log('Bot user data sent, response:', response);
+      });
+    },
+    emitMessageBotUser: ({message, prompt} : {message: any, prompt: any}) => {
+      console.log('emitMessageBotUser', message, prompt);
+      if (!chatSocket) return;
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      chatSocket.emit('send_message_bot_user', {message, prompt, tz}, (response : any) => {
+        console.log('Message sent, response:', response);
+        dispatch({ type: 'ADD_MESSAGE', payload: response });
+      });
+    },
     emitEditMessage: (message: any) => {
       if (!chatSocket) return;
       chatSocket.emit('edit_message', message);
