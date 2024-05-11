@@ -1,3 +1,4 @@
+
 const chatReducer = (state = { chat: null, messages: [], isTypingUser: null }, action : any) : any => {
   let index : any;
   let newMessages : any;

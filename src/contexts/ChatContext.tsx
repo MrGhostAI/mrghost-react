@@ -41,12 +41,14 @@ export interface ChatContextType {
   messages: Message[];
   sendMessage: (text: string) => void;
   isAiTyping: boolean;
+  botUser: Object;
 }
 
 export const ChatContext = React.createContext<ChatContextType>({
   messages: [],
   sendMessage: () => {},
   isAiTyping: false,
+  botUser: {},
 });
 
 const saveChatToLocalStorage = (botId: string, key: string, data: string) => {
@@ -73,6 +75,7 @@ export const ChatProvider = ({
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [isAiTyping, setAiTyping] = React.useState<boolean>(false);
+  const [botUser, setBotUser] = React.useState<Object>({});
   const { functions } = React.useContext(ActionContext);
 
   // Create a socket connection on component mount
@@ -143,6 +146,7 @@ export const ChatProvider = ({
       },
       (data: SavedChatMessage) => {
         setMessages(data.messages);
+        setBotUser(data.botUser);
         saveChatToLocalStorage(botId, "chatUserId", data.chatUserId || "");
         saveChatToLocalStorage(botId, "chatId", data.chatId || "");
       }
@@ -210,7 +214,7 @@ export const ChatProvider = ({
   };
 
   return (
-    <ChatContext.Provider value={{ messages, sendMessage, isAiTyping }}>
+    <ChatContext.Provider value={{ botUser, messages, sendMessage, isAiTyping }}>
       {children}
     </ChatContext.Provider>
   );

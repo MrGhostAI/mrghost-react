@@ -1,7 +1,7 @@
 {
   "package-name": "mrghost",
   "name": "mrghost",
-  "version": "0.0.15",
+  "version": "0.0.29",
   "authors": [
     "Evan Phibbs"
   ],
@@ -23,15 +23,16 @@
     "url": "https://github.com/MrGhostAI/mrghost-react"
   },
   "private": false,
-  "main": "src/index.tsx",
-  "module": "src/index.tsx",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "start": "react-scripts start",
-    "build": "webpack",
+    "build": "tsc && copyfiles -u 1 src/components/Chat/*.css dist && copyfiles -u 1 src/components/Chat/PulsatingDot/PulsatingDot.css dist && copyfiles -u 1 src/index.css dist",
     "prepublishOnly": "npm run build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -39,10 +40,6 @@
   "devDependencies": {
     "@babel/preset-env": "^7.23.9",
     "@babel/preset-typescript": "^7.23.3",
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.8",
-    "@mui/material": "^5.15.7",
     "@storybook/addon-essentials": "^7.6.14",
     "@storybook/addon-interactions": "^7.6.14",
     "@storybook/addon-links": "^7.6.14",
@@ -56,6 +53,7 @@
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@types/showdown": "^2.0.6",
+    "copyfiles": "^2.4.1",
     "css-loader": "^7.1.1",
     "eslint": "^8.57.0",
     "eslint-plugin-storybook": "^0.6.15",
@@ -64,7 +62,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
-    "socket.io-client": "^4.7.4",
     "storybook": "^7.6.14",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
@@ -86,8 +83,13 @@
   },
   "dependencies": {
     "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.3",
     "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.8",
+    "@mui/material": "^5.15.7",
     "showdown": "^2.1.0",
+    "socket.io-client": "^4.7.4",
     "styled-components": "^6.1.8"
   }
 }
