@@ -1,1 +1,1 @@
-export * from "./Chat/index.tsx";
+export * from "./Chat";
