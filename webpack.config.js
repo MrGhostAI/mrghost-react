@@ -22,6 +22,11 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
+        test: /\.ts?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
         test: /\.svg$/,
         type: 'asset/resource', // Use asset/resource for SVG files
         generator: {
