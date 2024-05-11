@@ -13,12 +13,13 @@ import {Socket, io} from 'socket.io-client';
  * @param functions - Additional functions to emit events.
  */
 
-const useChatSocket = ({ domain = "https://app.mrghost.ai", isAdmin, preview, postLocalStorage, dispatch, functions=null} : {
+const useChatSocket = ({ domain = "https://app.mrghost.ai", isAdmin, preview, postLocalStorage, dispatch, setHasUnreadMessages, functions=null} : {
   domain?: string,
   isAdmin: boolean,
   preview: boolean,
   postLocalStorage: boolean | null,
   dispatch: any,
+  setHasUnreadMessages: any,
   functions: any,
 }) => {
   const [chatSocket, setChatSocket] = useState<Socket | null>(null);
@@ -92,6 +93,7 @@ const useChatSocket = ({ domain = "https://app.mrghost.ai", isAdmin, preview, po
     socket.on('receive_message_fragment', (fragment : any) => {
       console.log('receive message fragment', fragment);
       if (!fragment) return;
+      setHasUnreadMessages(true);
       dispatch({ type: 'ADD_MESSAGE_FRAGMENT', payload: fragment });
     });
 

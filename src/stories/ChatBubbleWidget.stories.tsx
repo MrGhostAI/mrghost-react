@@ -14,7 +14,7 @@ function ChatActionStory({
   chatUserId: string;
 }) {
   return (
-    <ActionProvider>
+    <ActionProvider botId={botId}>
       <WidgetStory botId={botId} chatUserId={chatUserId} />
     </ActionProvider>
   );
@@ -35,11 +35,15 @@ function WidgetStory({
   }, [], {
     name: "greet",
     description: "A function that greets the world.",
-    properties: {
-      name: {
-        type: "string",
-        description: "The name of the user to greet.",
+    parameters: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description: "The name of the user to greet.",
+        },
       },
+      required: ["name"],
     },
   });
 
@@ -51,11 +55,15 @@ function WidgetStory({
   }, [], {
     name: "change-background-color",
     description: "A function that changes the background color of the website.",
-    properties: {
-      color: {
-        type: "string",
-        description: "Any CSS color value (e.g. 'red', '#ff0000', 'rgb(255, 0, 0)').",
+    parameters: {
+      type: "object",
+      properties: {
+        color: {
+          type: "string",
+          description: "Any CSS color value (e.g. 'red', '#ff0000', 'rgb(255, 0, 0)').",
+        },
       },
+      required: ["color"],
     },
   });
 

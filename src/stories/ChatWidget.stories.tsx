@@ -14,7 +14,7 @@ function ChatActionStory({
   chatUserId: string;
 }) {
   return (
-    <ActionProvider>
+    <ActionProvider botId={botId} userId={chatUserId}>
       <WidgetStory botId={botId} chatUserId={chatUserId} />
     </ActionProvider>
   );

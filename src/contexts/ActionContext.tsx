@@ -145,10 +145,10 @@ export const ActionProvider: React.FunctionComponent<ActionProviderProps> = ({
  * A hook that allows users to access to states in the actions.
  * @returns An action context store.
  */
-export const useAction = () => {
+export const useActionContext = () => {
   const context = React.useContext(ActionContext);
   if (!context) {
-    throw new Error("useAction must be used within an ActionProvider");
+    throw new Error("useActionContext must be used within an ActionProvider");
   }
   return context;
 };

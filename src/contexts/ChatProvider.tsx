@@ -23,6 +23,8 @@ interface ChatContextType {
   additionalFunctions: any;
   hasUnreadMessages: boolean;
   setHasUnreadMessages: (hasUnreadMessages: boolean) => void;
+  bubbleVisible: boolean;
+  setBubbleVisible: (bubbleVisible: boolean) => void;
 }
 
 export const ChatContext = createContext<ChatContextType>({
@@ -39,6 +41,8 @@ export const ChatContext = createContext<ChatContextType>({
   additionalFunctions: null,
   hasUnreadMessages: false,
   setHasUnreadMessages: () => {},
+  bubbleVisible: false,
+  setBubbleVisible: () => {},
 });
 
 export const ChatProvider = ({
@@ -60,6 +64,7 @@ export const ChatProvider = ({
   botUserId?: string | null,
   postLocalStorage?: boolean | null,
   preview?: boolean,
+  contexts?: string[] | null,
   additionalFunctions?: any,
   children: React.ReactNode,
 }
@@ -77,7 +82,7 @@ export const ChatProvider = ({
     messages: [],
     isTypingUser: null,
   });
-
+  const [bubbleVisible, setBubbleVisible] = useState(false);
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
   // Custom hook to manage socket connection and events
@@ -94,6 +99,7 @@ export const ChatProvider = ({
     preview,
     postLocalStorage,
     dispatch,
+    setHasUnreadMessages,
     functions: additionalFunctions
   });
 
@@ -177,7 +183,7 @@ export const ChatProvider = ({
   }
 
   function setBotUserData(data : Object) {
-    setBotUser((prevBotUser) => (
+    setBotUser((prevBotUser: any) => (
       { ...(prevBotUser || {}), data: {...(prevBotUser?.data || {}), ...data} }
     ));
     emitBotUserData(data);
@@ -208,7 +214,9 @@ export const ChatProvider = ({
         isAdmin,
         refreshChatLocalStorage,
         chatId,
-        additionalFunctions
+        additionalFunctions,
+        bubbleVisible,
+        setBubbleVisible
       }}
     >
       {children}

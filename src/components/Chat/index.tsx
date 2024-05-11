@@ -19,13 +19,12 @@ import './Chat.css';
 import './chatShadow.css';
 
 // import PromoteMessage from './PromoteMessage.js';
-import { BotProvider, BotContext } from '../../contexts/BotContext';
+import { BotContext } from '../../contexts/BotContext';
 import {defaultChatStyles} from '../../theme';
-import { ChatContext, ChatProvider } from '../../contexts/ChatProvider';
+import { ChatContext } from '../../contexts/ChatProvider';
 import ChatIcon from './Elements/ChatIcon';
 import { getHumanReadableDate } from '../../Utils/Date';
 import { areEqual, convertToHTML } from './Utils/ChatUtils';
-import {ActionContext} from '../../contexts/ActionContext';
 
 const styles = {
   header: {
@@ -175,7 +174,6 @@ const ChatIconButton = React.memo(function ChatIconButton({
   defaultStyles = {},
 } : {icon: any, handleOnClick: () => void, defaultStyles: any}){
   const { bot } = useContext(BotContext);
-  // const {hasUnreadMessages} = useContext(ChatContext);
 
   if (!bot) return null;
 
@@ -222,8 +220,9 @@ export function MainMessageComponent({
   margin = '10px 0',
   chatStyles,
   aboveBubble=false,
-} : {message: any, myRoles: string[], margin: string, chatStyles: any, aboveBubble?: boolean}) {
-  console.log('Rerender MainMessageComponent', message.text);
+  animate=false,
+} : {message: any, myRoles: string[], margin: string, chatStyles: any, aboveBubble?: boolean, animate?: boolean}) {
+  console.log('Rerender MainMessageComponent', message.text, animate);
   const { bot } = useContext(BotContext);
   console.log('MainMessageComponent bot', bot);
   const isRight = myRoles.includes(message.role || '');
@@ -232,11 +231,33 @@ export function MainMessageComponent({
   const rightCorner = { borderRadius: '24px 24px 0px 24px' };
   const bubbleStyle = isRight ? rightCorner : leftCorner;
   const aboveBubbleStyle = aboveBubble ? { maxWidth: '100%', boxShadow: '0 0 0.75rem 0 rgba(0,0,0,0.2)' } : {};
+  const [messageText, setMessageText] = useState('');
+  const wordArray = useRef(message.text.split(' '));
+  const speed = 100;
   useEffect(() => {
     console.log('MainMessageComponent first', message.text);
   }, []);
 
-  if (message.functionCall) {
+  useEffect(() => {
+    if (!animate) {
+      return;
+    }
+    const index: any = messageText.length ? messageText.split(' ').length : 0;
+    if (index < wordArray.current.length) {
+      const timer = setTimeout(() => {
+        setMessageText((prev) => {
+          console.log('setting message text', prev, ' :: ', wordArray.current[index], ' :: ', prev + (prev.length > 0 ? ' ' : '') + (wordArray.current[index.current] || ''));
+          return prev + (prev.length > 0 ? ' ' : '') + (wordArray.current[index] || '')
+        });
+      }, speed);
+
+      return () => clearTimeout(timer);
+    }
+
+    return () => {};
+  }, [messageText, speed]);
+
+  if (message.tool_calls?.length > 0 || message.role==='tool') {
     // return (
     //   <Box sx={{ margin: margin }}>
     //     <Divider>
@@ -308,7 +329,7 @@ export function MainMessageComponent({
           }}
           className="message-text"
           dangerouslySetInnerHTML={{
-            __html: convertToHTML(message.text),
+            __html: convertToHTML(animate ? messageText : message.text),
           }}
         />
         <Typography
@@ -336,7 +357,8 @@ export function MessageList({
   MessageComponent,
   blank,
   previewMessages,
-} : {messages: any[], myRoles: string[], chatStyles: any, preview: boolean, MessageComponent: any, blank: boolean, previewMessages: any[]}) {
+  animateFirstMessage = true,
+} : {messages: any[], myRoles: string[], chatStyles: any, preview: boolean, MessageComponent: any, blank: boolean, previewMessages: any[], animateFirstMessage?: boolean}) {
   console.log('Rerender MessageList', messages, preview, blank, previewMessages, blank);
   useEffect(() => {
     console.log('MessageList first');
@@ -384,6 +406,7 @@ export function MessageList({
               message={message}
               myRoles={myRoles}
               chatStyles={chatStyles}
+              animate={animateFirstMessage && index === 0 && messages.length === 1}
             />
           </React.Fragment>
         );
@@ -498,7 +521,7 @@ export function InputBar({ sendMessage, chatStyles, preview } : {sendMessage: (t
         });
         setBlockSubsequent(true);
       }
-  const textFieldRef = useRef(null);
+  const textFieldRef: any = useRef(null);
 
   useEffect(() => {
     // Check if the TextField reference exists
@@ -558,7 +581,7 @@ export function InputBar({ sendMessage, chatStyles, preview } : {sendMessage: (t
   );
 }
 
-function getChatButtonStyles(isTypingUser) {
+function getChatButtonStyles(isTypingUser: any) {
   return {
     visibility: isTypingUser ? 'visible' : 'hidden',
     opacity: isTypingUser ? 1 : 0,
@@ -608,7 +631,7 @@ export function ChatClient({
   const scrollRef = useRef(null);
   const containerRef = useRef(null);
   const [hasInitialScroll, setHasInitialScroll] = useState(false);
-  const [messagesCount, setMessagesCount] = useState(0);
+  // const [messagesCount, setMessagesCount] = useState(0);
   const myRoles = isAdmin ? ['admin', 'ai'] : ['user'];
 
   chatStyles = {
@@ -641,10 +664,10 @@ export function ChatClient({
     },
   ];
 
-  useEffect(() => {
-    console.log('messages changed', messages.length);
-    setMessagesCount(messages.length)
-  }, [messages]);
+  // useEffect(() => {
+  //   console.log('messages changed', messages.length);
+  //   setMessagesCount(messages.length)
+  // }, [messages]);
 
   const scrollToBottom = () => {
     if (!messages || preview || blank || messages.length === 0) return;
@@ -670,18 +693,10 @@ export function ChatClient({
       setHasInitialScroll(true);
     }
   };
-  useLayoutEffect(scrollToBottom, [messagesCount, preview, blank]);
-
-  const [hasShadow, setHasShadow] = useState(false);
-  const [shadowStyle, setShadowStyle] = useState({});
-
-  // const handleScroll = (e) => {
-  //   e.stopPropagation();
-  //   // Your scroll handling logic here
-  // };
+  useLayoutEffect(scrollToBottom, [messages, preview, blank]);
 
   const handleScroll = () => {
-    const element = scrollRef.current;
+    const element: any = scrollRef.current;
     if (!element) return;
 
     const scrollTop = element.scrollTop;
@@ -691,7 +706,8 @@ export function ChatClient({
     const atTop = scrollTop === 0;
     const atBottom = scrollTop + clientHeight >= scrollHeight;
 
-    const containerElement = containerRef.current;
+    const containerElement: any = containerRef.current;
+    if (!containerElement) return;
     if (atTop && atBottom) {
       containerElement.classList.remove('shadow-top', 'shadow-bottom');
     } else if (atTop) {
@@ -707,7 +723,7 @@ export function ChatClient({
 
   // Function to handle scroll events
   useEffect(() => {
-    const element = scrollRef.current;
+    const element: any = scrollRef.current;
     element.addEventListener('scroll', handleScroll);
 
     return () => {
@@ -732,7 +748,7 @@ export function ChatClient({
   return (
     <Box sx={{...styles.chat, backgroundColor: chatStyles?.backgroundColor || '#fff'}}> 
       {disableHeader ? null : (
-        <Box sx={{ boxShadow: hasShadow ? '0 2px 10px rgba(0,0,0,0.1)' : 'none',
+        <Box sx={{ boxShadow: 'none',
         transition: 'box-shadow 0.3s ease-in-out' }}>
           <Header
             exitHandler={exitHandler}
@@ -793,7 +809,7 @@ export function ChatClient({
                 }}
               >
                 {
-                  bot.settings?.quickMessages.map((message, index) => (
+                  bot.settings?.quickMessages.map((message: any, index: number) => (
                     <Button
                       key={index}
                       onClick={() => sendMessage(message)}
@@ -859,16 +875,31 @@ function ChatReadMonitor({isChatOpen} : {isChatOpen: boolean}) {
   return null;
 }
 
+function RespondComponent() {
+  // an input field to respond to the message with a send button
+  const {
+    sendMessage,
+  } = useContext(ChatContext);
+  return (
+    <div style={{ borderRadius: '1rem 1rem 0rem 1rem', backgroundColor: 'rgba(255, 255, 255, 0.6)', boxShadow: '0 0 0.5rem 0 rgba(0,0,0,0.2)', backdropFilter: 'blur(4px)', overflow: 'hidden' }}>
+      <InputBar sendMessage={sendMessage} chatStyles={{}} preview={false} />
+    </div>
+  );
+}
+
 export function BubbleChat({
-  icon = null
+  icon = null,
+  visible = true,
 } : {botId: string, chatId?: string | null, userId?: string | null, visible?: boolean, icon?: any | null, domain?: string}) {
   const { bot } = useContext(BotContext);
-  const { hasUnreadMessages, setHasUnreadMessages, messages } = useContext(ChatContext);
+  const { hasUnreadMessages, messages } = useContext(ChatContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(isChatOpen);
+  const [delayedVisible, setDelayedVisible] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [isQuickMessageOpen, setIsQuickMessageOpen] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setLoaded(true); // Trigger the fade-in effect after the component mounts
   }, []);
 
@@ -885,6 +916,23 @@ export function BubbleChat({
     return () => {};
   }, [isChatOpen]);
 
+  useEffect(() => {
+    if (visible) {
+      setDelayedVisible(true);
+    } else {
+      const timer = setTimeout(() => {
+        setDelayedVisible(false);
+      }, 300); // Delay matches the transition duration
+
+      return () => clearTimeout(timer);
+    }
+    return () => {};
+  }, [visible]);
+
+  useEffect(() => {
+    setIsQuickMessageOpen(hasUnreadMessages || !isChatOpen);
+  }, [hasUnreadMessages, isChatOpen]);
+
   const handleOnClick = () => {
     console.debug('clicked', isChatOpen);
     setIsChatOpen(!isChatOpen);
@@ -897,7 +945,9 @@ export function BubbleChat({
   const lastMessageText = lastMessage?.text || '';
 
   return (
-    <div style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 2147483647, opacity: loaded ? 1 : 0, transition: 'opacity 0.3s ease' }}>
+    <div style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 2147483647, opacity: (loaded && visible) ? 1 : 0, 
+    visibility: (loaded && delayedVisible) ? 'visible' : 'hidden',
+    transition: 'opacity 0.3s ease' }}>
       <ChatIconButton
         icon={icon}
         handleOnClick={handleOnClick}
@@ -909,27 +959,31 @@ export function BubbleChat({
         right: '1rem', width: 'calc(100vw - 2rem)',
         maxWidth: '20rem',
         zIndex: 2147483647,
-        display: hasUnreadMessages && lastMessageText ? 'block' : 'none',
+        display: isQuickMessageOpen ? 'block' : 'none'
       }}>
         <span
-        onClick={() => setHasUnreadMessages(false)} 
-        style={{ 
-          cursor: 'pointer', 
-          position: 'absolute', 
-          top: '-0.5rem', 
-          right: '-0.5rem',
-          zIndex: 1000, 
-          color: '#333', 
-          fontSize: '1rem', 
-          backgroundColor: 'rgba(255, 255, 255, 0.6)', 
-          boxShadow: '0 0 0.5rem 0 rgba(0,0,0,0.2)',
-          borderRadius: '2rem', 
-          padding: '0rem 0.4rem',
-          backdropFilter: 'blur(4px)'
-        }}>
+          onClick={() => setIsQuickMessageOpen(false)}
+          style={{ 
+            cursor: 'pointer', 
+            position: 'absolute', 
+            top: '-0.5rem', 
+            right: '-0.5rem',
+            zIndex: 1000, 
+            color: '#333', 
+            fontSize: '1rem', 
+            backgroundColor: 'rgba(255, 255, 255, 0.6)', 
+            boxShadow: '0 0 0.5rem 0 rgba(0,0,0,0.2)',
+            borderRadius: '2rem', 
+            padding: '0rem 0.4rem',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
           &times;
-        </span> 
-        <MainMessageComponent message={{text: lastMessageText}} myRoles={['user']} margin={'0'} chatStyles={{}} aboveBubble={true} />
+        </span>
+        <div style={{display: hasUnreadMessages && lastMessageText ? 'block' : 'none'}}>
+          <MainMessageComponent message={{text: lastMessageText}} myRoles={['user']} margin={'0'} chatStyles={{}} aboveBubble={true} />
+        </div>
+        <RespondComponent />
       </Box>
       <Box
         sx={{

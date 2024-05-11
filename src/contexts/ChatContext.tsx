@@ -41,14 +41,12 @@ export interface ChatContextType {
   messages: Message[];
   sendMessage: (text: string) => void;
   isAiTyping: boolean;
-  botUser: any;
 }
 
 export const ChatContext = React.createContext<ChatContextType>({
   messages: [],
   sendMessage: () => {},
   isAiTyping: false,
-  botUser: {},
 });
 
 const saveChatToLocalStorage = (botId: string, key: string, data: string) => {
@@ -212,7 +210,7 @@ export const ChatProvider = ({
   };
 
   return (
-    <ChatContext.Provider value={{ botUser, messages, sendMessage, isAiTyping }}>
+    <ChatContext.Provider value={{ messages, sendMessage, isAiTyping }}>
       {children}
     </ChatContext.Provider>
   );
